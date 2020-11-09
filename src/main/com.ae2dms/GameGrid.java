@@ -7,7 +7,7 @@ public class GameGrid implements Iterable {
     final int COLUMNS;
     final int ROWS;
 
-    private final GameObject[][] gameObjects;
+    private GameObject[][] gameObjects;
 
     public GameGrid(int columns, int rows) {
         COLUMNS = columns;

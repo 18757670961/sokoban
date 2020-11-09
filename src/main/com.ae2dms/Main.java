@@ -80,8 +80,7 @@ public class Main extends Application {
         loadDefaultSaveFile(primaryStage);
     }
 
-    void loadDefaultSaveFile(Stage primaryStage) {
-        this.primaryStage = primaryStage;
+    void loadDefaultSaveFile(Stage primaryStage) { this.primaryStage = primaryStage;
         InputStream in = getClass().getClassLoader().getResourceAsStream("level/SampleGame.skb");
         initializeGame(in);
         setEventFilter();
@@ -96,9 +95,7 @@ public class Main extends Application {
         primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             gameEngine.handleKey(event.getCode());
             reloadGrid();
-        });
-    }
-
+        });}
     private void loadGameFile() throws FileNotFoundException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Save File");
@@ -110,10 +107,7 @@ public class Main extends Application {
                 GameEngine.logger.info("Loading save file: " + saveFile.getName());
             }
             initializeGame(new FileInputStream(saveFile));
-        }
-    }
-
-    private void reloadGrid() {
+        }}private void reloadGrid() {
         if (gameEngine.isGameComplete()) {
             showVictoryMessage();
             return;
@@ -124,8 +118,7 @@ public class Main extends Application {
         gameGrid.getChildren().clear();
         while (levelGridIterator.hasNext()) {
             addObjectToGrid(levelGridIterator.next(), levelGridIterator.getcurrentposition());
-        }
-        gameGrid.autosize();
+        }gameGrid.autosize();
         primaryStage.sizeToScene();
     }
 
@@ -170,10 +163,8 @@ public class Main extends Application {
     public void closeGame() {
         System.exit(0);
     }
-
     public void saveGame() {
     }
-
     public void loadGame() {
         try {
             loadGameFile();
@@ -182,12 +173,8 @@ public class Main extends Application {
         }
     }
 
-    public void undo() {
-        closeGame();
-    }
-
-    public void resetLevel() {
-    }
+    public void undo() { closeGame(); }
+    public void resetLevel() {}
 
     public void showAbout() {
         String title = "About this game";
@@ -195,11 +182,9 @@ public class Main extends Application {
 
         newDialog(title, message, null);
     }
-
     public void toggleMusic() {
         // TODO
     }
-
     public void toggleDebug() {
         gameEngine.toggleDebug();
         reloadGrid();
