@@ -11,9 +11,9 @@ import java.util.logging.SimpleFormatter;
 
 public class GameLogger extends Logger {
 
-    private static Logger logger = Logger.getLogger("GameLogger");
-    private DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    private Calendar calendar = Calendar.getInstance();
+    private static final Logger logger = Logger.getLogger("GameLogger");
+    private final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private final Calendar calendar = Calendar.getInstance();
 
     public GameLogger() throws IOException {
         super("com.aes2dms.sokoban", null);
@@ -31,14 +31,17 @@ public class GameLogger extends Logger {
         return dateFormat.format(calendar.getTime()) + " -- " + message;
     }
 
+    @Override
     public void info(String message) {
         logger.info(createFormattedMessage(message));
     }
 
+    @Override
     public void warning(String message) {
         logger.warning(createFormattedMessage(message));
     }
 
+    @Override
     public void severe(String message) {
         logger.severe(createFormattedMessage(message));
     }

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -29,9 +30,10 @@ public class GameEngine {
         } catch (IOException x) {
             System.out.println("Cannot create logger.");
         } catch (NoSuchElementException e) {
-            logger.warning("Cannot load the default save file: " + e.getStackTrace());
+            logger.warning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
         }
     }
+
     public static boolean isDebugActive() {
         return debug;
     }
@@ -183,6 +185,7 @@ public class GameEngine {
     public boolean isGameComplete() {
         return gameComplete;
     }
+
     public Level getNextLevel() {
         if (currentLevel == null) {
             return levels.get(0);
@@ -198,6 +201,7 @@ public class GameEngine {
     public Level getCurrentLevel() {
         return currentLevel;
     }
+
     public void toggleDebug() {
         debug = !debug;
     }
