@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'application'
+    id "org.jetbrains.gradle.plugin.idea-ext" version "0.5"
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+}
+dependencies {
+    compile 'junit:junit:4.12'
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "main.com.ae2dms.Main"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+application {
+    mainClassName = 'main.com.ae2dms.Main'
+}

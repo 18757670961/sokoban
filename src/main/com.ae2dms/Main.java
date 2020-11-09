@@ -1,4 +1,4 @@
-package com.ae2dms;
+package main.com.ae2dms;
 
 import javafx.application.Application;
 import javafx.geometry.Pos;

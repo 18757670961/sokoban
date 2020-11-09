@@ -118,6 +118,11 @@ gradle-app.setting
 ###################################################################################
 
 # sourcetrail
-.srctrlbm
-.srctrldb
-.srctrlprj
+*.srctrlbm
+*.srctrldb
+*.srctrlprj
+
+# visual paradigm
+vpproject/
+
+lib/
