@@ -1,4 +1,4 @@
-package main.com.ae2dms;
+package com.ae2dms;
 
 import java.awt.*;
 import java.util.Iterator;
@@ -12,7 +12,7 @@ public final class Level implements Iterable<GameObject> {
     private int numberOfDiamonds = 0;
     private Point keeperPosition = new Point(0, 0);
 
-    public Level(String levelName, int levelIndex, List<String> raw_level) {
+    public Level(String levelName, int levelIndex, List<String> rawLevel) {
         if (GameEngine.isDebugActive()) {
             System.out.printf("[ADDING LEVEL] LEVEL [%d]: %s\n", levelIndex, levelName);
         }
@@ -20,16 +20,16 @@ public final class Level implements Iterable<GameObject> {
         name = levelName;
         index = levelIndex;
 
-        int rows = raw_level.size();
-        int columns = raw_level.get(0).trim().length();
+        int rows = rawLevel.size();
+        int columns = rawLevel.get(0).trim().length();
 
         objectsGrid = new GameGrid(rows, columns);
         diamondsGrid = new GameGrid(rows, columns);
 
-        for (int row = 0; row < raw_level.size(); row++) {
+        for (int row = 0; row < rawLevel.size(); row++) {
 
-            for (int col = 0; col < raw_level.get(row).length(); col++) {
-                GameObject curTile = GameObject.fromChar(raw_level.get(row).charAt(col));
+            for (int col = 0; col < rawLevel.get(row).length(); col++) {
+                GameObject curTile = GameObject.fromChar(rawLevel.get(row).charAt(col));
 
                 if (curTile == GameObject.DIAMOND) {
                     numberOfDiamonds++;

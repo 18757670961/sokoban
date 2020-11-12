@@ -93,8 +93,8 @@ gradle-app.setting
 *.srctrlprj
 
 # visual paradigm
-vpproject/
-sokoban.vpdm/
+/vpproject/*
+/sokoban.vpdm/*
 
-logs/
-build/
+/logs/*
+/build/*

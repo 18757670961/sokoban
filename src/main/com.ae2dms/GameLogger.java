@@ -1,4 +1,4 @@
-package main.com.ae2dms;
+package com.ae2dms;
 
 import java.io.File;
 import java.io.IOException;

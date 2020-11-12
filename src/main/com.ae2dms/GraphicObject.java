@@ -1,4 +1,4 @@
-package main.com.ae2dms;
+package com.ae2dms;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
