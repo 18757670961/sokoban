@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+    id 'application'
+    id "org.jetbrains.gradle.plugin.idea-ext" version "0.5"
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main']
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ['src/test']
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+javafx {
+    version = '12'
+    modules = modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "main.com.ae2dms.Main"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+application {
+    mainClassName = 'main.com.ae2dms.Main'
+}
