@@ -59,4 +59,44 @@ class MainTest {
     @Test
     void toggleDebug() {
     }
+
+    @Test
+    void testMain() {
+    }
+
+    @Test
+    void testStart() {
+    }
+
+    @Test
+    void testCloseGame() {
+    }
+
+    @Test
+    void testSaveGame() {
+    }
+
+    @Test
+    void testLoadGame() {
+    }
+
+    @Test
+    void testUndo() {
+    }
+
+    @Test
+    void testResetLevel() {
+    }
+
+    @Test
+    void testShowAbout() {
+    }
+
+    @Test
+    void testToggleMusic() {
+    }
+
+    @Test
+    void testToggleDebug() {
+    }
 }

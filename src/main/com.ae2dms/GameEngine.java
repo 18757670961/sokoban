@@ -12,51 +12,64 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * The type Game engine.
+ */
 public class GameEngine {
-    public static final String GAME_NAME = "SokobanFX";
-    public static GameLogger logger;
-    public int movesCount = 0;
-    public String mapSetName;
+    // transfer public fields to private
+    private static final String GAME_NAME = "Sokoban";
+    private static GameLogger logger;
     private static boolean debug = false;
+    private int movesCount = 0;
+    private String mapSetName;
     private Level currentLevel;
     private List<Level> levels;
     private boolean gameComplete = false;
 
+    /**
+     * Instantiates a new Game engine.
+     *
+     * @param input      the input
+     * @param production the production
+     */
     public GameEngine(InputStream input, boolean production) {
         try {
             logger = new GameLogger();
             levels = loadGameFile(input);
             currentLevel = getNextLevel();
-        } catch (IOException x) {
+        } catch (IOException e) {
             System.out.println("Cannot create logger.");
         } catch (NoSuchElementException e) {
             logger.warning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
+    /**
+     * Is debug active boolean.
+     *
+     * @return the boolean
+     */
     public static boolean isDebugActive() {
         return debug;
     }
 
+    /**
+     * Handle key.
+     *
+     * @param code the code
+     */
     public void handleKey(KeyCode code) {
+        // switch replaced with enhanced switch
         switch (code) {
-            case UP:
-                move(new Point(-1, 0));
-                break;
+            case UP -> move(new Point(-1, 0));
 
-            case RIGHT:
-                move(new Point(0, 1));
-                break;
+            case RIGHT -> move(new Point(0, 1));
 
-            case DOWN:
-                move(new Point(1, 0));
-                break;
+            case DOWN -> move(new Point(1, 0));
 
-            case LEFT:
-                move(new Point(0, -1));
-                break;
+            case LEFT -> move(new Point(0, -1));
 
-            default:
+            default -> {}
                 // TODO: implement something funny.
         }
 
@@ -65,6 +78,11 @@ public class GameEngine {
         }
     }
 
+    /**
+     * Move.
+     *
+     * @param delta the delta
+     */
     private void move(Point delta) {
         if (isGameComplete()) {
             return;
@@ -83,6 +101,11 @@ public class GameEngine {
             System.out.printf("Target object: %s at [%s]", keeperTarget, targetObjectPoint);
         }
 
+        // method extracted
+        moveKeeper(delta, keeperPosition, keeper, targetObjectPoint, keeperTarget);
+    }
+
+    private void moveKeeper(Point delta, Point keeperPosition, GameObject keeper, Point targetObjectPoint, GameObject keeperTarget) {
         boolean keeperMoved = false;
 
         switch (keeperTarget) {
@@ -128,6 +151,12 @@ public class GameEngine {
         }
     }
 
+    /**
+     * Load game file list.
+     *
+     * @param input the input
+     * @return the list
+     */
     private List<Level> loadGameFile(InputStream input) {
         List<Level> levels = new ArrayList<>(5);
         int levelIndex = 0;
@@ -182,10 +211,20 @@ public class GameEngine {
         return levels;
     }
 
+    /**
+     * Is game complete boolean.
+     *
+     * @return the boolean
+     */
     public boolean isGameComplete() {
         return gameComplete;
     }
 
+    /**
+     * Gets next level.
+     *
+     * @return the next level
+     */
     public Level getNextLevel() {
         if (currentLevel == null) {
             return levels.get(0);
@@ -198,11 +237,39 @@ public class GameEngine {
         return null;
     }
 
+    /**
+     * Toggle debug.
+     */
+    public void toggleDebug() {
+        debug = !debug;
+    }
+
+    /**
+     * Gets current level.
+     *
+     * @return the current level
+     */
     public Level getCurrentLevel() {
         return currentLevel;
     }
 
-    public void toggleDebug() {
-        debug = !debug;
+    public static String getGameName() {
+        return GAME_NAME;
+    }
+
+    public static GameLogger getLogger() {
+        return logger;
+    }
+
+    public int getMovesCount() {
+        return movesCount;
+    }
+
+    public String getMapSetName() {
+        return mapSetName;
+    }
+
+    public List<Level> getLevels() {
+        return levels;
     }
 }

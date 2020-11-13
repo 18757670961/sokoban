@@ -26,8 +26,11 @@ public final class Level implements Iterable<GameObject> {
         objectsGrid = new GameGrid(rows, columns);
         diamondsGrid = new GameGrid(rows, columns);
 
-        for (int row = 0; row < rawLevel.size(); row++) {
+        setLevel(rawLevel); // method extracted
+    }
 
+    private void setLevel(List<String> rawLevel) {
+        for (int row = 0; row < rawLevel.size(); row++) {
             for (int col = 0; col < rawLevel.get(row).length(); col++) {
                 GameObject curTile = GameObject.fromChar(rawLevel.get(row).charAt(col));
 
@@ -45,7 +48,7 @@ public final class Level implements Iterable<GameObject> {
         }
     }
 
-    boolean isComplete() {
+    public boolean isComplete() {
         int cratedDiamondsCount = 0;
         for (int row = 0; row < objectsGrid.ROWS; row++) {
             for (int col = 0; col < objectsGrid.COLUMNS; col++) {
@@ -61,15 +64,15 @@ public final class Level implements Iterable<GameObject> {
         return name;
     }
 
-    int getIndex() {
+    public int getIndex() {
         return index;
     }
 
-    Point getKeeperPosition() {
+    public Point getKeeperPosition() {
         return keeperPosition;
     }
 
-    GameObject getTargetObject(Point source, Point delta) {
+    public GameObject getTargetObject(Point source, Point delta) {
         return objectsGrid.getTargetFromSource(source, delta);
     }
 
