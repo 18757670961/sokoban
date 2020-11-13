@@ -169,7 +169,7 @@ public class GameEngine {
      * @param input the input
      * @return the list
      */
-    private List<Level> loadGameFile(InputStream input) {
+    private final List<Level> loadGameFile(InputStream input) {
         List<Level> levels = new ArrayList<>(5);
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
@@ -285,7 +285,7 @@ public class GameEngine {
         return mapSetName;
     }
 
-    public List<Level> getLevels() {
+    public final List<Level> getLevels() {
         return levels;
     }
 }
