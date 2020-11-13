@@ -42,17 +42,17 @@ public class GameGrid implements Iterable {
         return gameObjects[col][row];
     }
 
-    public GameObject getGameObjectAt(Point p) throws IllegalArgumentException {
-        if (p == null) {
+    public GameObject getGameObjectAt(Point point) throws IllegalArgumentException {
+        if (point == null) {
             throw new IllegalArgumentException("Point cannot be null.");
         }
 
-        return getGameObjectAt((int) p.getX(), (int) p.getY());
+        return getGameObjectAt((int) point.getX(), (int) point.getY());
     }
 
-    public boolean removeGameObjectAt(Point position) {
-        return putGameObjectAt(null, position);
-    }
+//    public boolean removeGameObjectAt(Point position) {
+//        return putGameObjectAt(null, position);
+//    }
 
     public boolean putGameObjectAt(GameObject gameObject, int x, int y) {
         if (isPointOutOfBounds(x, y)) {

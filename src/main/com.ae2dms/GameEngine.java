@@ -108,36 +108,38 @@ public class GameEngine {
     private void moveKeeper(Point delta, Point keeperPosition, GameObject keeper, Point targetObjectPoint, GameObject keeperTarget) {
         boolean keeperMoved = false;
 
+        // switch replaced with enhanced switch
         switch (keeperTarget) {
 
-            case WALL:
-                break;
+            case WALL -> {}
 
-            case CRATE:
-
+            case CRATE -> {
                 GameObject crateTarget = currentLevel.getTargetObject(targetObjectPoint, delta);
                 if (crateTarget != GameObject.FLOOR) {
                     break;
                 }
 
-                currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(targetObjectPoint, delta)), targetObjectPoint);
-                currentLevel.objectsGrid.putGameObjectAt(keeperTarget, GameGrid.translatePoint(targetObjectPoint, delta));
-                currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
-                currentLevel.objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
+                moveTargetCrate(delta, keeperPosition, keeper, targetObjectPoint, keeperTarget);
+                keeperMoved = true;
+            }
+
+            case FLOOR -> {
+                moveTargetFloor(delta, keeperPosition, keeper);
                 keeperMoved = true;
                 break;
+            }
 
-            case FLOOR:
-                currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
-                currentLevel.objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
-                keeperMoved = true;
-                break;
-
-            default:
+            default -> {
                 logger.severe("The object to be moved was not a recognised GameObject.");
                 throw new AssertionError("This should not have happened. Report this problem to the developer.");
+            }
+
         }
 
+        checkKeeperPosition(delta, keeperPosition, keeperMoved);
+    }
+
+    private void checkKeeperPosition(Point delta, Point keeperPosition, boolean keeperMoved) {
         if (keeperMoved) {
             keeperPosition.translate((int) delta.getX(), (int) delta.getY());
             movesCount++;
@@ -151,6 +153,16 @@ public class GameEngine {
         }
     }
 
+    private void moveTargetFloor(Point delta, Point keeperPosition, GameObject keeper) {
+        currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
+        currentLevel.objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
+    }
+
+    private void moveTargetCrate(Point delta, Point keeperPosition, GameObject keeper, Point targetObjectPoint, GameObject keeperTarget) {
+        moveTargetFloor(delta, targetObjectPoint, keeperTarget);
+        moveTargetFloor(delta, keeperPosition, keeper);
+    }
+
     /**
      * Load game file list.
      *
@@ -159,48 +171,14 @@ public class GameEngine {
      */
     private List<Level> loadGameFile(InputStream input) {
         List<Level> levels = new ArrayList<>(5);
-        int levelIndex = 0;
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
             boolean parsedFirstLevel = false;
             List<String> rawLevel = new ArrayList<>();
             String levelName = "";
 
-            while (true) {
-                String line = reader.readLine();
-
-                if (line == null) {
-                    if (rawLevel.size() != 0) {
-                        Level parsedLevel = new Level(levelName, ++levelIndex, rawLevel);
-                        levels.add(parsedLevel);
-                    }
-                    break;
-                }
-
-                if (line.contains("MapSetName")) {
-                    mapSetName = line.replace("MapSetName: ", "");
-                    continue;
-                }
-
-                if (line.contains("LevelName")) {
-                    if (parsedFirstLevel) {
-                        Level parsedLevel = new Level(levelName, ++levelIndex, rawLevel);
-                        levels.add(parsedLevel);
-                        rawLevel.clear();
-                    } else {
-                        parsedFirstLevel = true;
-                    }
-
-                    levelName = line.replace("LevelName: ", "");
-                    continue;
-                }
-
-                line = line.trim();
-                line = line.toUpperCase();
-                if (line.matches(".*W.*W.*")) {
-                    rawLevel.add(line);
-                }
-            }
+            int levelIndex = 0;
+            readFile(levels, levelIndex, reader, parsedFirstLevel, rawLevel, levelName);
 
         } catch (IOException e) {
             logger.severe("Error trying to load the game file: " + e);
@@ -209,6 +187,44 @@ public class GameEngine {
         }
 
         return levels;
+    }
+
+    private void readFile(List<Level> levels, int levelIndex, BufferedReader reader, boolean parsedFirstLevel, List<String> rawLevel, String levelName) throws IOException {
+        while (true) {
+            String line = reader.readLine();
+
+            if (line == null) {
+                if (rawLevel.size() != 0) {
+                    Level parsedLevel = new Level(levelName, ++levelIndex, rawLevel);
+                    levels.add(parsedLevel);
+                }
+                break;
+            }
+
+            if (line.contains("MapSetName")) {
+                mapSetName = line.replace("MapSetName: ", "");
+                continue;
+            }
+
+            if (line.contains("LevelName")) {
+                if (parsedFirstLevel) {
+                    Level parsedLevel = new Level(levelName, ++levelIndex, rawLevel);
+                    levels.add(parsedLevel);
+                    rawLevel.clear();
+                } else {
+                    parsedFirstLevel = true;
+                }
+
+                levelName = line.replace("LevelName: ", "");
+                continue;
+            }
+
+            line = line.trim();
+            line = line.toUpperCase();
+            if (line.matches(".*W.*W.*")) {
+                rawLevel.add(line);
+            }
+        }
     }
 
     /**

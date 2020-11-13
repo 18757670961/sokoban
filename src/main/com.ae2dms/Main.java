@@ -58,6 +58,11 @@ public class Main extends Application {
         Menu menuAbout = createMenuAbout();
         menu.getMenus().addAll(menuFile, menuLevel, menuAbout);
 
+        createPane(primaryStage); // method extracted
+        loadDefaultSaveFile(primaryStage);
+    }
+
+    private void createPane(Stage primaryStage) {
         gameGrid = new GridPane();
         root = new GridPane();
         root.add(menu, 0, 0);
@@ -65,7 +70,6 @@ public class Main extends Application {
         primaryStage.setTitle(GameEngine.getGameName());
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-        loadDefaultSaveFile(primaryStage);
     }
 
     /**
@@ -125,7 +129,7 @@ public class Main extends Application {
      */
     private void loadDefaultSaveFile(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("level/debugGame.skb"); // variable name changed
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("level/sampleGame.skb"); // variable name changed
         initializeGame(inputStream);
         setEventFilter();
     }

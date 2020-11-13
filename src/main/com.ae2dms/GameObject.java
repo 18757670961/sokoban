@@ -15,9 +15,9 @@ public enum GameObject {
         this.symbol = symbol;
     }
 
-    public static GameObject fromChar(char c) {
+    public static GameObject fromChar(char character) {
         for (GameObject gameObject : GameObject.values()) {
-            if (Character.toUpperCase(c) == gameObject.symbol) {
+            if (Character.toUpperCase(character) == gameObject.symbol) {
                 return gameObject;
             }
         }
