@@ -36,12 +36,7 @@ class GraphicObject extends Rectangle {
             case DIAMOND -> {
                 color = Color.DEEPSKYBLUE;
                 if (GameEngine.isDebugActive()) {
-                    FadeTransition fadeTransition = new FadeTransition(Duration.millis(1000), this); // variable name changed
-                    fadeTransition.setFromValue(1.0);
-                    fadeTransition.setToValue(0.2);
-                    fadeTransition.setCycleCount(Timeline.INDEFINITE);
-                    fadeTransition.setAutoReverse(true);
-                    fadeTransition.play();
+                    setTransition();
                 }
             }
             case KEEPER -> color = Color.RED;
@@ -54,5 +49,15 @@ class GraphicObject extends Rectangle {
             }
         }
         return color;
+    }
+
+    // method extracted
+    private void setTransition() {
+        FadeTransition fadeTransition = new FadeTransition(Duration.millis(1000), this); // variable name changed
+        fadeTransition.setFromValue(1.0);
+        fadeTransition.setToValue(0.2);
+        fadeTransition.setCycleCount(Timeline.INDEFINITE);
+        fadeTransition.setAutoReverse(true);
+        fadeTransition.play();
     }
 }

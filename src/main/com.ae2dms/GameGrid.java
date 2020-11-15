@@ -17,7 +17,7 @@ public class GameGrid implements Iterable {
         gameObjects = new GameObject[COLUMNS][ROWS];
     }
 
-    static Point translatePoint(Point sourceLocation, Point delta) {
+    public static Point translatePoint(Point sourceLocation, Point delta) {
         Point translatedPoint = new Point(sourceLocation);
         translatedPoint.translate((int) delta.getX(), (int) delta.getY());
         return translatedPoint;
@@ -27,19 +27,20 @@ public class GameGrid implements Iterable {
         return new Dimension(COLUMNS, ROWS);
     }
 
-    GameObject getTargetFromSource(Point source, Point delta) {
+    public GameObject getTargetFromSource(Point source, Point delta) {
         return getGameObjectAt(translatePoint(source, delta));
     }
 
     public GameObject getGameObjectAt(int col, int row) throws ArrayIndexOutOfBoundsException {
-        if (isPointOutOfBounds(col, row)) {
-            if (GameEngine.isDebugActive()) {
-                System.out.printf("Trying to get null GameObject from COL: %d  ROW: %d", col, row);
-            }
-            throw new ArrayIndexOutOfBoundsException("The point [" + col + ":" + row + "] is outside the map.");
+        // if structure improved
+        if (!isPointOutOfBounds(col, row)) {
+            return gameObjects[col][row];
         }
 
-        return gameObjects[col][row];
+        if (GameEngine.isDebugActive()) {
+            System.out.printf("Trying to get null GameObject from COL: %d  ROW: %d", col, row);
+        }
+        throw new ArrayIndexOutOfBoundsException("The point [" + col + ":" + row + "] is outside the map.");
     }
 
     public GameObject getGameObjectAt(Point point) throws IllegalArgumentException {

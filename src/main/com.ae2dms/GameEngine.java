@@ -24,7 +24,7 @@ public class GameEngine {
     private String mapSetName;
     private Level currentLevel;
     private List<Level> levels;
-    private boolean gameComplete = false;
+    private boolean gameComplete;
 
     /**
      * Instantiates a new Game engine.
@@ -35,8 +35,9 @@ public class GameEngine {
     public GameEngine(InputStream input, boolean production) {
         try {
             logger = new GameLogger();
-            levels = loadGameFile(input);
+            levels = prepareFileReader(input);
             currentLevel = getNextLevel();
+            gameComplete = false;
         } catch (IOException e) {
             System.out.println("Cannot create logger.");
         } catch (NoSuchElementException e) {
@@ -69,8 +70,9 @@ public class GameEngine {
 
             case LEFT -> move(new Point(0, -1));
 
-            default -> {}
-                // TODO: implement something funny.
+            default -> {
+            }
+            // TODO: implement something funny.
         }
 
         if (isDebugActive()) {
@@ -111,7 +113,8 @@ public class GameEngine {
         // switch replaced with enhanced switch
         switch (keeperTarget) {
 
-            case WALL -> {}
+            case WALL -> {
+            }
 
             case CRATE -> {
                 GameObject crateTarget = currentLevel.getTargetObject(targetObjectPoint, delta);
@@ -140,17 +143,21 @@ public class GameEngine {
     }
 
     private void checkKeeperPosition(Point delta, Point keeperPosition, boolean keeperMoved) {
-        if (keeperMoved) {
-            keeperPosition.translate((int) delta.getX(), (int) delta.getY());
-            movesCount++;
-            if (currentLevel.isComplete()) {
-                if (isDebugActive()) {
-                    System.out.println("Level complete!");
-                }
+        // if structure improved
+        if (!keeperMoved)
+            return;
 
-                currentLevel = getNextLevel();
-            }
+        keeperPosition.translate((int) delta.getX(), (int) delta.getY());
+        movesCount++;
+
+        if (!currentLevel.isComplete())
+            return;
+
+        if (isDebugActive()) {
+            System.out.println("Level complete!");
         }
+
+        currentLevel = getNextLevel();
     }
 
     private void moveTargetFloor(Point delta, Point keeperPosition, GameObject keeper) {
@@ -169,7 +176,8 @@ public class GameEngine {
      * @param input the input
      * @return the list
      */
-    private final List<Level> loadGameFile(InputStream input) {
+    // method name changed
+    private final List<Level> prepareFileReader(InputStream input) {
         List<Level> levels = new ArrayList<>(5);
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
@@ -241,7 +249,7 @@ public class GameEngine {
      *
      * @return the next level
      */
-    public Level getNextLevel() {
+    private Level getNextLevel() {
         if (currentLevel == null) {
             return levels.get(0);
         }

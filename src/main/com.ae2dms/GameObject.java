@@ -9,13 +9,14 @@ public enum GameObject {
     CRATE_ON_DIAMOND('O'),
     DEBUG_OBJECT('=');
 
-    public final char symbol;
+    private final char symbol;
 
     GameObject(final char symbol) {
         this.symbol = symbol;
     }
 
-    public static GameObject fromChar(char character) {
+    // method name changed
+    public static GameObject toGameObject(char character) {
         for (GameObject gameObject : GameObject.values()) {
             if (Character.toUpperCase(character) == gameObject.symbol) {
                 return gameObject;

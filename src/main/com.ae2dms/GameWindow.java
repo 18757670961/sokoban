@@ -1,20 +1,13 @@
 package com.ae2dms;
 
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
-import javafx.scene.effect.Effect;
 import javafx.scene.effect.MotionBlur;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.awt.*;
@@ -137,7 +130,7 @@ public class GameWindow {
         gameGrid.getChildren().clear();
 
         while (levelGridIterator.hasNext()) {
-            addObjectToGrid(levelGridIterator.next(), levelGridIterator.getcurrentposition());
+            addObjectToGrid(levelGridIterator.next(), levelGridIterator.getCurrentPosition());
         }
 
         gameGrid.autosize();
@@ -169,14 +162,14 @@ public class GameWindow {
     /**
      * Close game.
      */
-    public void closeGame() {
+    private void closeGame() {
         System.exit(0);
     }
 
     /**
      * Save game.
      */
-    public void saveGame() {
+    private void saveGame() {
         GameFile saveFile = new GameFile();
         saveFile.saveGameFile(primaryStage);
     }
@@ -184,7 +177,7 @@ public class GameWindow {
     /**
      * Load game.
      */
-    public void loadGame() {
+    private void loadGame() {
         try {
             InputStream fileInput;
             GameFile loadFile = new GameFile();
@@ -201,20 +194,20 @@ public class GameWindow {
     /**
      * Undo.
      */
-    public void undo() {
+    private void undo() {
         closeGame();
     }
 
     /**
      * Reset level.
      */
-    public void resetLevel() {
+    private void resetLevel() {
     }
 
     /**
      * Show about.
      */
-    public void showAbout() {
+    private void showAbout() {
         String title = "About this game";
         String message = "Game created by Shuguang LYU (Desmond)\n";
 
@@ -224,14 +217,14 @@ public class GameWindow {
     /**
      * Toggle music.
      */
-    public void toggleMusic() {
+    private void toggleMusic() {
         // TODO
     }
 
     /**
      * Toggle debug.
      */
-    public void toggleDebug() {
+    private void toggleDebug() {
         gameEngine.toggleDebug();
         reloadGrid();
     }
