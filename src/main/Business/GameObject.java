@@ -1,4 +1,4 @@
-package com.ae2dms;
+package Business;
 
 public enum GameObject {
     WALL('W'),

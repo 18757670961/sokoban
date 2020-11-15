@@ -1,5 +1,6 @@
-package com.ae2dms;
+package Main;
 
+import GUI.GameWindow;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

@@ -1,4 +1,6 @@
-package com.ae2dms;
+package Debug;
+
+import Business.GameEngine;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +18,7 @@ public class GameLogger extends Logger {
     private final Calendar calendar = Calendar.getInstance();
 
     public GameLogger() throws IOException {
-        super("com.aes2dms.sokoban", null);
+        super("Sokoban", null);
 
         File directory = new File(System.getProperty("user.dir") + "/" + "logs");
         directory.mkdirs();

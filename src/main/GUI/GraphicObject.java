@@ -1,5 +1,7 @@
-package com.ae2dms;
+package GUI;
 
+import Business.GameEngine;
+import Business.GameObject;
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
@@ -7,8 +9,8 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-class GraphicObject extends Rectangle {
-    GraphicObject(GameObject obj) {
+public class GraphicObject extends Rectangle {
+    public GraphicObject(GameObject obj) {
         Paint color = setColor(obj);
 
         this.setFill(color);

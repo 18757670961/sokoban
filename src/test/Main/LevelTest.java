@@ -1,12 +1,10 @@
-package com.ae2dms;
+package Main;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class GameEngineTest {
+class LevelTest {
 
     @BeforeEach
     void setUp() {
@@ -17,26 +15,30 @@ class GameEngineTest {
     }
 
     @Test
-    void isDebugActive() {
+    void isComplete() {
     }
 
     @Test
-    void handleKey() {
+    void getName() {
     }
 
     @Test
-    void isGameComplete() {
+    void getIndex() {
     }
 
     @Test
-    void getNextLevel() {
+    void getKeeperPosition() {
     }
 
     @Test
-    void getCurrentLevel() {
+    void getTargetObject() {
     }
 
     @Test
-    void toggleDebug() {
+    void testToString() {
+    }
+
+    @Test
+    void iterator() {
     }
 }
