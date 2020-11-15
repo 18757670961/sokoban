@@ -12,52 +12,67 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * The type Game engine.
+ */
 public class GameEngine {
-    public static final String GAME_NAME = "SokobanFX";
-    public static GameLogger logger;
-    public int movesCount = 0;
-    public String mapSetName;
+    // transfer public fields to private
+    private static final String GAME_NAME = "Sokoban";
+    private static GameLogger logger;
     private static boolean debug = false;
+    private int movesCount = 0;
+    private static String mapSetName;
     private Level currentLevel;
     private List<Level> levels;
-    private boolean gameComplete = false;
+    private boolean gameComplete;
 
+    /**
+     * Instantiates a new Game engine.
+     *
+     * @param input      the input
+     * @param production the production
+     */
     public GameEngine(InputStream input, boolean production) {
         try {
             logger = new GameLogger();
-            levels = loadGameFile(input);
+            levels = GameFile.prepareFileReader(input);
             currentLevel = getNextLevel();
-        } catch (IOException x) {
+            gameComplete = false;
+        } catch (IOException e) {
             System.out.println("Cannot create logger.");
         } catch (NoSuchElementException e) {
             logger.warning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
+    /**
+     * Is debug active boolean.
+     *
+     * @return the boolean
+     */
     public static boolean isDebugActive() {
         return debug;
     }
 
+    /**
+     * Handle key.
+     *
+     * @param code the code
+     */
     public void handleKey(KeyCode code) {
+        // switch replaced with enhanced switch
         switch (code) {
-            case UP:
-                move(new Point(-1, 0));
-                break;
+            case UP -> move(new Point(-1, 0));
 
-            case RIGHT:
-                move(new Point(0, 1));
-                break;
+            case RIGHT -> move(new Point(0, 1));
 
-            case DOWN:
-                move(new Point(1, 0));
-                break;
+            case DOWN -> move(new Point(1, 0));
 
-            case LEFT:
-                move(new Point(0, -1));
-                break;
+            case LEFT -> move(new Point(0, -1));
 
-            default:
-                // TODO: implement something funny.
+            default -> {
+            }
+            // TODO: implement something funny.
         }
 
         if (isDebugActive()) {
@@ -65,6 +80,11 @@ public class GameEngine {
         }
     }
 
+    /**
+     * Move.
+     *
+     * @param delta the delta
+     */
     private void move(Point delta) {
         if (isGameComplete()) {
             return;
@@ -83,110 +103,88 @@ public class GameEngine {
             System.out.printf("Target object: %s at [%s]", keeperTarget, targetObjectPoint);
         }
 
+        // method extracted
+        moveKeeper(delta, keeperPosition, keeper, targetObjectPoint, keeperTarget);
+    }
+
+    private void moveKeeper(Point delta, Point keeperPosition, GameObject keeper, Point targetObjectPoint, GameObject keeperTarget) {
         boolean keeperMoved = false;
 
+        // switch replaced with enhanced switch
         switch (keeperTarget) {
 
-            case WALL:
-                break;
+            case WALL -> {
+            }
 
-            case CRATE:
-
+            case CRATE -> {
                 GameObject crateTarget = currentLevel.getTargetObject(targetObjectPoint, delta);
                 if (crateTarget != GameObject.FLOOR) {
                     break;
                 }
 
-                currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(targetObjectPoint, delta)), targetObjectPoint);
-                currentLevel.objectsGrid.putGameObjectAt(keeperTarget, GameGrid.translatePoint(targetObjectPoint, delta));
-                currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
-                currentLevel.objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
+                moveTargetCrate(delta, keeperPosition, keeper, targetObjectPoint, keeperTarget);
+                keeperMoved = true;
+            }
+
+            case FLOOR -> {
+                moveTargetFloor(delta, keeperPosition, keeper);
                 keeperMoved = true;
                 break;
+            }
 
-            case FLOOR:
-                currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
-                currentLevel.objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
-                keeperMoved = true;
-                break;
-
-            default:
+            default -> {
                 logger.severe("The object to be moved was not a recognised GameObject.");
                 throw new AssertionError("This should not have happened. Report this problem to the developer.");
-        }
-
-        if (keeperMoved) {
-            keeperPosition.translate((int) delta.getX(), (int) delta.getY());
-            movesCount++;
-            if (currentLevel.isComplete()) {
-                if (isDebugActive()) {
-                    System.out.println("Level complete!");
-                }
-
-                currentLevel = getNextLevel();
-            }
-        }
-    }
-
-    private List<Level> loadGameFile(InputStream input) {
-        List<Level> levels = new ArrayList<>(5);
-        int levelIndex = 0;
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
-            boolean parsedFirstLevel = false;
-            List<String> rawLevel = new ArrayList<>();
-            String levelName = "";
-
-            while (true) {
-                String line = reader.readLine();
-
-                if (line == null) {
-                    if (rawLevel.size() != 0) {
-                        Level parsedLevel = new Level(levelName, ++levelIndex, rawLevel);
-                        levels.add(parsedLevel);
-                    }
-                    break;
-                }
-
-                if (line.contains("MapSetName")) {
-                    mapSetName = line.replace("MapSetName: ", "");
-                    continue;
-                }
-
-                if (line.contains("LevelName")) {
-                    if (parsedFirstLevel) {
-                        Level parsedLevel = new Level(levelName, ++levelIndex, rawLevel);
-                        levels.add(parsedLevel);
-                        rawLevel.clear();
-                    } else {
-                        parsedFirstLevel = true;
-                    }
-
-                    levelName = line.replace("LevelName: ", "");
-                    continue;
-                }
-
-                line = line.trim();
-                line = line.toUpperCase();
-                if (line.matches(".*W.*W.*")) {
-                    rawLevel.add(line);
-                }
             }
 
-        } catch (IOException e) {
-            logger.severe("Error trying to load the game file: " + e);
-        } catch (NullPointerException e) {
-            logger.severe("Cannot open the requested file: " + e);
         }
 
-        return levels;
+        checkKeeperPosition(delta, keeperPosition, keeperMoved);
     }
 
+    private void checkKeeperPosition(Point delta, Point keeperPosition, boolean keeperMoved) {
+        // if structure improved
+        if (!keeperMoved)
+            return;
+
+        keeperPosition.translate((int) delta.getX(), (int) delta.getY());
+        movesCount++;
+
+        if (!currentLevel.isComplete())
+            return;
+
+        if (isDebugActive()) {
+            System.out.println("Level complete!");
+        }
+
+        currentLevel = getNextLevel();
+    }
+
+    private void moveTargetFloor(Point delta, Point keeperPosition, GameObject keeper) {
+        currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
+        currentLevel.objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
+    }
+
+    private void moveTargetCrate(Point delta, Point keeperPosition, GameObject keeper, Point targetObjectPoint, GameObject keeperTarget) {
+        moveTargetFloor(delta, targetObjectPoint, keeperTarget);
+        moveTargetFloor(delta, keeperPosition, keeper);
+    }
+
+    /**
+     * Is game complete boolean.
+     *
+     * @return the boolean
+     */
     public boolean isGameComplete() {
         return gameComplete;
     }
 
-    public Level getNextLevel() {
+    /**
+     * Gets next level.
+     *
+     * @return the next level
+     */
+    private Level getNextLevel() {
         if (currentLevel == null) {
             return levels.get(0);
         }
@@ -198,11 +196,43 @@ public class GameEngine {
         return null;
     }
 
+    /**
+     * Toggle debug.
+     */
+    public void toggleDebug() {
+        debug = !debug;
+    }
+
+    /**
+     * Gets current level.
+     *
+     * @return the current level
+     */
     public Level getCurrentLevel() {
         return currentLevel;
     }
 
-    public void toggleDebug() {
-        debug = !debug;
+    public static String getGameName() {
+        return GAME_NAME;
+    }
+
+    public static GameLogger getLogger() {
+        return logger;
+    }
+
+    public int getMovesCount() {
+        return movesCount;
+    }
+
+    public static String getMapSetName() {
+        return mapSetName;
+    }
+
+    public static void setMapSetName(String name) {
+        mapSetName = name;
+    }
+
+    public final List<Level> getLevels() {
+        return levels;
     }
 }

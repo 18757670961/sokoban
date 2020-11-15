@@ -21,10 +21,10 @@ public class GameLogger extends Logger {
         File directory = new File(System.getProperty("user.dir") + "/" + "logs");
         directory.mkdirs();
 
-        FileHandler fh = new FileHandler(directory + "/" + GameEngine.GAME_NAME + ".log");
-        logger.addHandler(fh);
+        FileHandler fileHandler = new FileHandler(directory + "/" + GameEngine.getGameName() + ".log"); // variable name changed
+        logger.addHandler(fileHandler);
         SimpleFormatter formatter = new SimpleFormatter();
-        fh.setFormatter(formatter);
+        fileHandler.setFormatter(formatter);
     }
 
     private String createFormattedMessage(String message) {
