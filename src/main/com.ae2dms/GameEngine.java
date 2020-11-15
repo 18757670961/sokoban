@@ -21,7 +21,7 @@ public class GameEngine {
     private static GameLogger logger;
     private static boolean debug = false;
     private int movesCount = 0;
-    private String mapSetName;
+    private static String mapSetName;
     private Level currentLevel;
     private List<Level> levels;
     private boolean gameComplete;
@@ -35,7 +35,7 @@ public class GameEngine {
     public GameEngine(InputStream input, boolean production) {
         try {
             logger = new GameLogger();
-            levels = prepareFileReader(input);
+            levels = GameFile.prepareFileReader(input);
             currentLevel = getNextLevel();
             gameComplete = false;
         } catch (IOException e) {
@@ -171,71 +171,6 @@ public class GameEngine {
     }
 
     /**
-     * Load game file list.
-     *
-     * @param input the input
-     * @return the list
-     */
-    // method name changed
-    private final List<Level> prepareFileReader(InputStream input) {
-        List<Level> levels = new ArrayList<>(5);
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
-            boolean parsedFirstLevel = false;
-            List<String> rawLevel = new ArrayList<>();
-            String levelName = "";
-
-            int levelIndex = 0;
-            readFile(levels, levelIndex, reader, parsedFirstLevel, rawLevel, levelName);
-
-        } catch (IOException e) {
-            logger.severe("Error trying to load the game file: " + e);
-        } catch (NullPointerException e) {
-            logger.severe("Cannot open the requested file: " + e);
-        }
-
-        return levels;
-    }
-
-    private void readFile(List<Level> levels, int levelIndex, BufferedReader reader, boolean parsedFirstLevel, List<String> rawLevel, String levelName) throws IOException {
-        while (true) {
-            String line = reader.readLine();
-
-            if (line == null) {
-                if (rawLevel.size() != 0) {
-                    Level parsedLevel = new Level(levelName, ++levelIndex, rawLevel);
-                    levels.add(parsedLevel);
-                }
-                break;
-            }
-
-            if (line.contains("MapSetName")) {
-                mapSetName = line.replace("MapSetName: ", "");
-                continue;
-            }
-
-            if (line.contains("LevelName")) {
-                if (parsedFirstLevel) {
-                    Level parsedLevel = new Level(levelName, ++levelIndex, rawLevel);
-                    levels.add(parsedLevel);
-                    rawLevel.clear();
-                } else {
-                    parsedFirstLevel = true;
-                }
-
-                levelName = line.replace("LevelName: ", "");
-                continue;
-            }
-
-            line = line.trim();
-            line = line.toUpperCase();
-            if (line.matches(".*W.*W.*")) {
-                rawLevel.add(line);
-            }
-        }
-    }
-
-    /**
      * Is game complete boolean.
      *
      * @return the boolean
@@ -289,8 +224,12 @@ public class GameEngine {
         return movesCount;
     }
 
-    public String getMapSetName() {
+    public static String getMapSetName() {
         return mapSetName;
+    }
+
+    public static void setMapSetName(String name) {
+        mapSetName = name;
     }
 
     public final List<Level> getLevels() {
