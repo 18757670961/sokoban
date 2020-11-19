@@ -11,13 +11,16 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-public class GameLogger extends Logger {
+/**
+ * singleton class
+ */
+public final class GameLogger extends Logger {
 
     private static final Logger logger = Logger.getLogger("GameLogger");
-    private final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    private final Calendar calendar = Calendar.getInstance();
+    private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private static final Calendar calendar = Calendar.getInstance();
 
-    public GameLogger() throws IOException {
+    private GameLogger() throws IOException {
         super("Sokoban", null);
 
         File directory = new File(System.getProperty("user.dir") + "/" + "logs");
@@ -29,22 +32,19 @@ public class GameLogger extends Logger {
         fileHandler.setFormatter(formatter);
     }
 
-    private String createFormattedMessage(String message) {
+    private static String createFormattedMessage(String message) {
         return dateFormat.format(calendar.getTime()) + " -- " + message;
     }
 
-    @Override
-    public void info(String message) {
+    public static void showInfo(String message) {
         logger.info(createFormattedMessage(message));
     }
 
-    @Override
-    public void warning(String message) {
+    public static void showWarning(String message) {
         logger.warning(createFormattedMessage(message));
     }
 
-    @Override
-    public void severe(String message) {
+    public static void showSevere(String message) {
         logger.severe(createFormattedMessage(message));
     }
 }

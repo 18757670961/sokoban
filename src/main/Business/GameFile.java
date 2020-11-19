@@ -1,5 +1,6 @@
 package Business;
 
+import Debug.GameLogger;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -25,7 +26,7 @@ public class GameFile {
         file = fileChooser.showSaveDialog(primaryStage);
 
         if (file != null && GameEngine.isDebugActive()) {
-            GameEngine.getLogger().info("Saving file: " + file.getName());
+            GameLogger.showInfo("Saving file: " + file.getName());
         }
     }
 
@@ -41,7 +42,7 @@ public class GameFile {
         file = fileChooser.showOpenDialog(primaryStage);
 
         if (file != null && GameEngine.isDebugActive()) {
-            GameEngine.getLogger().info("Loading save file: " + file.getName());
+            GameLogger.showInfo("Loading save file: " + file.getName());
         }
 
         return new FileInputStream(file);
@@ -105,9 +106,9 @@ public class GameFile {
             readGameFile(new FileInfo(levels, levelIndex, reader, parsedFirstLevel, rawLevel, levelName));
 
         } catch (IOException e) {
-            GameEngine.getLogger().severe("Error trying to load the game file: " + e);
+            GameLogger.showSevere("Error trying to load the game file: " + e);
         } catch (NullPointerException e) {
-            GameEngine.getLogger().severe("Cannot open the requested file: " + e);
+            GameLogger.showSevere("Cannot open the requested file: " + e);
         }
 
         return levels;

@@ -16,7 +16,6 @@ import java.util.NoSuchElementException;
 public class GameEngine {
     // transfer public fields to private
     private static final String GAME_NAME = "Sokoban";
-    private static GameLogger logger;
     private static boolean debug = false;
     private int movesCount = 0;
     private static String mapSetName;
@@ -32,14 +31,11 @@ public class GameEngine {
      */
     public GameEngine(InputStream input, boolean production) {
         try {
-            logger = new GameLogger();
             levels = GameFile.prepareFileReader(input);
             currentLevel = getNextLevel();
             gameComplete = false;
-        } catch (IOException e) {
-            System.out.println("Cannot create logger.");
         } catch (NoSuchElementException e) {
-            logger.warning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
+            GameLogger.showWarning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -131,7 +127,7 @@ public class GameEngine {
             }
 
             default -> {
-                logger.severe("The object to be moved was not a recognised GameObject.");
+                GameLogger.showSevere("The object to be moved was not a recognised GameObject.");
                 throw new AssertionError("This should not have happened. Report this problem to the developer.");
             }
 
@@ -212,10 +208,6 @@ public class GameEngine {
 
     public static String getGameName() {
         return GAME_NAME;
-    }
-
-    public static GameLogger getLogger() {
-        return logger;
     }
 
     public int getMovesCount() {

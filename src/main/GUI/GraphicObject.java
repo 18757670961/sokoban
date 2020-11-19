@@ -2,6 +2,7 @@ package GUI;
 
 import Business.GameEngine;
 import Business.GameObject;
+import Debug.GameLogger;
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
@@ -46,7 +47,7 @@ public class GraphicObject extends Rectangle {
             case CRATE_ON_DIAMOND -> color = Color.DARKCYAN;
             default -> {
                 String message = "Error in Level constructor. Object not recognized.";
-                GameEngine.getLogger().severe(message);
+                GameLogger.showSevere(message);
                 throw new AssertionError(message);
             }
         }
