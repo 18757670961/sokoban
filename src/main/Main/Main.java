@@ -1,6 +1,7 @@
 package Main;
 
-import GUI.GameWindow;
+import Debug.GameLogger;
+import View.GameWindow;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -24,6 +25,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        GameLogger.createLogger();
         gameWindow = new GameWindow(primaryStage);
         loadDefaultSaveFile();
     }

@@ -1,6 +1,6 @@
 package Debug;
 
-import Engine.GameEngine;
+import Controller.GameEngine;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +16,7 @@ import java.util.logging.SimpleFormatter;
  */
 public final class GameLogger extends Logger {
 
+    private static GameLogger gameLogger;
     private static final Logger logger = Logger.getLogger("GameLogger");
     private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private static final Calendar calendar = Calendar.getInstance();
@@ -23,13 +24,19 @@ public final class GameLogger extends Logger {
     private GameLogger() throws IOException {
         super("Sokoban", null);
 
-        File directory = new File(System.getProperty("user.dir") + "/" + "logs");
+        File directory = new File("./logs");
         directory.mkdirs();
 
         FileHandler fileHandler = new FileHandler(directory + "/" + GameEngine.getGameName() + ".log"); // variable name changed
         logger.addHandler(fileHandler);
         SimpleFormatter formatter = new SimpleFormatter();
         fileHandler.setFormatter(formatter);
+    }
+
+    public static void createLogger() throws IOException {
+        if (gameLogger == null) {
+            gameLogger = new GameLogger();
+        }
     }
 
     private static String createFormattedMessage(String message) {
