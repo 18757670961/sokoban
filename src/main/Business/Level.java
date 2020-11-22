@@ -3,10 +3,11 @@ package Business;
 import Engine.GameEngine;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
-public final class Level implements Iterable<GameObject> {
+public final class Level implements Iterable<GameObject>, Serializable {
     public final GameGrid objectsGrid;
     public final GameGrid diamondsGrid;
     private final String name;

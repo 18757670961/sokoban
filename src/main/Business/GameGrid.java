@@ -3,18 +3,15 @@ package Business;
 import Engine.GameEngine;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.Iterator;
 
-public class GameGrid implements Iterable {
+public class GameGrid implements Iterable, Serializable {
     final int COLUMNS;
     final int ROWS;
     private final GameObject[][] gameObjects;
 
     public GameGrid(int columns, int rows) {
-        if (columns <= 0 && rows <= 0) {
-            throw new IllegalArgumentException();
-        }
-
         COLUMNS = columns;
         ROWS = rows;
 

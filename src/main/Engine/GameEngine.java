@@ -9,6 +9,7 @@ import javafx.scene.input.KeyCode;
 
 import java.awt.*;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -16,7 +17,7 @@ import java.util.NoSuchElementException;
 /**
  * The type Game engine.
  */
-public class GameEngine {
+public class GameEngine implements Serializable {
     // transfer public fields to private
     private static final String GAME_NAME = "Sokoban";
     private static boolean debug = false;
@@ -24,6 +25,7 @@ public class GameEngine {
     private static String mapSetName;
     private Level currentLevel;
     private List<Level> levels;
+    private Level[] serializableLevels;
     private boolean gameComplete;
 
     /**
@@ -32,7 +34,7 @@ public class GameEngine {
      * @param input      the input
      * @param production the production
      */
-    public GameEngine(InputStream input, boolean production) {
+    public GameEngine(InputStream input) {
         try {
             levels = GameFile.prepareFileReader(input);
             currentLevel = getNextLevel();
@@ -66,6 +68,10 @@ public class GameEngine {
             case DOWN -> getPositionInfo(new Point(1, 0));
 
             case LEFT -> getPositionInfo(new Point(0, -1));
+
+            case F1 -> getPositionInfo(new Point(0, -1)); // save game
+
+            case F2 -> getPositionInfo(new Point(0, -1)); // load game
 
             default -> {
             }
@@ -238,4 +244,15 @@ public class GameEngine {
         return levels;
     }
 
+    public void setLevels(List<Level> levels) {
+        this.levels = levels;
+    }
+
+    public Level[] getSerializableLevels() {
+        return serializableLevels;
+    }
+
+    public void setSerializableLevels(Level[] serializableLevels) {
+        this.serializableLevels = serializableLevels;
+    }
 }

@@ -15,6 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.awt.*;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -80,7 +81,7 @@ public class GameWindow {
      */
     private Menu createMenuFile() {
         MenuItem menuItemSaveGame = new MenuItem("Save Game");
-        menuItemSaveGame.setOnAction(actionEvent -> saveGame());
+        menuItemSaveGame.setOnAction(actionEvent -> saveGame(gameEngine));
         MenuItem menuItemLoadGame = new MenuItem("Load Game");
         menuItemLoadGame.setOnAction(actionEvent -> loadGame());
         MenuItem menuItemExit = new MenuItem("Exit");
@@ -103,10 +104,19 @@ public class GameWindow {
     /**
      * Initialize game.
      *
+     */
+    public void initializeGame(GameEngine gameEngine) {
+        this.gameEngine = gameEngine;
+        reloadGrid();
+    }
+
+    /**
+     * Initialize game.
+     *
      * @param input the input
      */
     public void initializeGame(InputStream input) {
-        gameEngine = new GameEngine(input, true);
+        gameEngine = new GameEngine(input);
         reloadGrid();
     }
 
@@ -173,22 +183,26 @@ public class GameWindow {
     /**
      * Save game.
      */
-    private void saveGame() {
+    public void saveGame(GameEngine gameEngine) {
         GameFile saveFile = new GameFile();
-        saveFile.saveGameFile(primaryStage);
+        saveFile.saveGameFile(primaryStage, gameEngine);
     }
 
     /**
      * Load game.
      */
-    private void loadGame() {
+    public void loadGame() {
         try {
-            InputStream fileInput;
+            Object fileInput;
             GameFile loadFile = new GameFile();
             fileInput = loadFile.loadGameFile(primaryStage);
 
             if (fileInput != null) {
-                initializeGame(fileInput);
+                if (fileInput instanceof GameEngine) {
+                    initializeGame((GameEngine) fileInput);
+                } else {
+                    initializeGame((FileInputStream) fileInput);
+                }
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

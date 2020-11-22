@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 // game file IO extracted
@@ -26,24 +27,36 @@ public class GameFile {
     /**
      * Save game file.
      */
-    public void saveGameFile(Stage primaryStage) {
+    public void saveGameFile(Stage primaryStage, GameEngine gameEngine) {
         createFileChooser();
         fileChooser.setTitle("Save File to");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.skb"));
-        fileChooser.setInitialDirectory(new File("./out/production/resources/level"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.dat"));
+        fileChooser.setInitialDirectory(new File("./src/main/resources/level"));
         file = fileChooser.showSaveDialog(primaryStage);
 
         if (file != null) {
-//            try {
-//                file
-//            } catch (IOException ex) {
-//                System.out.println(ex.getMessage());
-//            }
-
             if (GameEngine.isDebugActive()) {
                 GameLogger.showInfo("Saving file: " + file.getName());
             }
+
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file)))
+            {
+                // serialize gameEngine
+                serialize(gameEngine, out);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
+    }
+
+    private void serialize(GameEngine gameEngine, ObjectOutputStream out) throws IOException {
+        List<Level> levelList = gameEngine.getLevels();
+        Level[] levelArray = new Level[levelList.size()];
+        levelList.toArray(levelArray);
+        gameEngine.setSerializableLevels(levelArray);
+        out.writeObject(gameEngine);
     }
 
     /**
@@ -51,21 +64,45 @@ public class GameFile {
      *
      * @throws FileNotFoundException the file not found exception
      */
-    public FileInputStream loadGameFile(Stage primaryStage) throws FileNotFoundException {
+    public Object loadGameFile(Stage primaryStage) throws FileNotFoundException {
         createFileChooser();
         fileChooser.setTitle("Open Save File");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.skb"));
-        fileChooser.setInitialDirectory(new File("./out/production/resources/level"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.skb", "*.dat"));
+        fileChooser.setInitialDirectory(new File("./src/main/resources/level"));
         file = fileChooser.showOpenDialog(primaryStage);
 
         if (file != null) {
             if (GameEngine.isDebugActive()) {
                 GameLogger.showInfo("Loading save file: " + file.getName());
             }
-            return new FileInputStream(file);
+
+            String fileExtension = file.getName().substring(file.getName().lastIndexOf("."));
+            if (fileExtension.equals(".dat")) {
+                try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file)))
+                {
+                    // deserialize gameEngine
+                    return deserialize(in);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+                catch (ClassNotFoundException e)
+                {
+                    e.printStackTrace();
+                }
+            } else {
+                return new FileInputStream(file);
+            }
         }
 
         return null;
+    }
+
+    private GameEngine deserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        GameEngine gameEngine = (GameEngine) in.readObject();
+        gameEngine.setLevels(Arrays.asList(gameEngine.getSerializableLevels()));
+        return gameEngine;
     }
 
     // accept parameter object fileInfo
