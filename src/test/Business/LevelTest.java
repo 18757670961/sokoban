@@ -1,10 +1,12 @@
-package Main;
+package Business;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class GameGridTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class LevelTest {
 
     @BeforeEach
     void setUp() {
@@ -15,35 +17,23 @@ class GameGridTest {
     }
 
     @Test
-    void translatePoint() {
+    void isComplete() {
     }
 
     @Test
-    void getDimension() {
+    void getName() {
     }
 
     @Test
-    void getTargetFromSource() {
+    void getIndex() {
     }
 
     @Test
-    void getGameObjectAt() {
+    void getKeeperPosition() {
     }
 
     @Test
-    void testGetGameObjectAt() {
-    }
-
-    @Test
-    void removeGameObjectAt() {
-    }
-
-    @Test
-    void putGameObjectAt() {
-    }
-
-    @Test
-    void testPutGameObjectAt() {
+    void getTargetObject() {
     }
 
     @Test

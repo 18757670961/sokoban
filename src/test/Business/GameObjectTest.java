@@ -1,4 +1,4 @@
-package Main;
+package Business;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MainTest {
+class GameObjectTest {
 
     @BeforeEach
     void setUp() {
@@ -17,10 +17,22 @@ class MainTest {
     }
 
     @Test
-    void main() {
+    void toGameObject() {
     }
 
     @Test
-    void start() {
+    void getStringSymbol() {
+    }
+
+    @Test
+    void getCharSymbol() {
+    }
+
+    @Test
+    void values() {
+    }
+
+    @Test
+    void valueOf() {
     }
 }

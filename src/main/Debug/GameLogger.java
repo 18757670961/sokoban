@@ -1,6 +1,6 @@
 package Debug;
 
-import Business.GameEngine;
+import Engine.GameEngine;
 
 import java.io.File;
 import java.io.IOException;

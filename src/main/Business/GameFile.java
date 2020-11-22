@@ -1,6 +1,7 @@
 package Business;
 
 import Debug.GameLogger;
+import Engine.GameEngine;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -23,10 +24,19 @@ public class GameFile {
     public void saveGameFile(Stage primaryStage) {
         fileChooser.setTitle("Save File to");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.skb"));
+        fileChooser.setInitialDirectory(new File("./out/production/resources/level"));
         file = fileChooser.showSaveDialog(primaryStage);
 
-        if (file != null && GameEngine.isDebugActive()) {
-            GameLogger.showInfo("Saving file: " + file.getName());
+        if (file != null) {
+//            try {
+//                file
+//            } catch (IOException ex) {
+//                System.out.println(ex.getMessage());
+//            }
+
+            if (GameEngine.isDebugActive()) {
+                GameLogger.showInfo("Saving file: " + file.getName());
+            }
         }
     }
 
@@ -39,6 +49,7 @@ public class GameFile {
         fileChooser = new FileChooser();
         fileChooser.setTitle("Open Save File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.skb"));
+        fileChooser.setInitialDirectory(new File("./out/production/resources/level"));
         file = fileChooser.showOpenDialog(primaryStage);
 
         if (file != null && GameEngine.isDebugActive()) {
@@ -54,10 +65,7 @@ public class GameFile {
             String line = fileInfo.reader.readLine();
 
             if (line == null) {
-                if (fileInfo.rawLevel.size() != 0) {
-                    Level parsedLevel = new Level(fileInfo.levelName, ++fileInfo.levelIndex, fileInfo.rawLevel);
-                    fileInfo.levels.add(parsedLevel);
-                }
+                parseRawLevel(fileInfo);
                 break;
             }
 
@@ -67,15 +75,7 @@ public class GameFile {
             }
 
             if (line.contains("LevelName")) {
-                if (fileInfo.parsedFirstLevel) {
-                    Level parsedLevel = new Level(fileInfo.levelName, ++fileInfo.levelIndex, fileInfo.rawLevel);
-                    fileInfo.levels.add(parsedLevel);
-                    fileInfo.rawLevel.clear();
-                } else {
-                    fileInfo.parsedFirstLevel = true;
-                }
-
-                fileInfo.levelName = line.replace("LevelName: ", "");
+                parseLevel(fileInfo, line);
                 continue;
             }
 
@@ -85,6 +85,27 @@ public class GameFile {
                 fileInfo.rawLevel.add(line);
             }
         }
+    }
+
+    // method extracted
+    private static void parseRawLevel(FileInfo fileInfo) {
+        if (fileInfo.rawLevel.size() != 0) {
+            Level parsedLevel = new Level(fileInfo.levelName, ++fileInfo.levelIndex, fileInfo.rawLevel);
+            fileInfo.levels.add(parsedLevel);
+        }
+    }
+
+    // method extracted
+    private static void parseLevel(FileInfo fileInfo, String line) {
+        if (fileInfo.parsedFirstLevel) {
+            Level parsedLevel = new Level(fileInfo.levelName, ++fileInfo.levelIndex, fileInfo.rawLevel);
+            fileInfo.levels.add(parsedLevel);
+            fileInfo.rawLevel.clear();
+        } else {
+            fileInfo.parsedFirstLevel = true;
+        }
+
+        fileInfo.levelName = line.replace("LevelName: ", "");
     }
 
     /**

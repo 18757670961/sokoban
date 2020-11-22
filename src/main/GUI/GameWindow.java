@@ -1,6 +1,6 @@
 package GUI;
 
-import Business.GameEngine;
+import Engine.GameEngine;
 import Business.GameFile;
 import Business.GameObject;
 import Business.Level;

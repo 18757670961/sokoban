@@ -1,6 +1,6 @@
 package GUI;
 
-import Business.GameEngine;
+import Engine.GameEngine;
 import Business.GameObject;
 import Debug.GameLogger;
 import javafx.animation.FadeTransition;

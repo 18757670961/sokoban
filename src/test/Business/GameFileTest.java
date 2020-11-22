@@ -1,10 +1,12 @@
-package Main;
+package Business;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class GameEngineTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class GameFileTest {
 
     @BeforeEach
     void setUp() {
@@ -15,26 +17,18 @@ class GameEngineTest {
     }
 
     @Test
-    void isDebugActive() {
+    void saveGameFile() {
     }
 
     @Test
-    void handleKey() {
+    void loadGameFile() {
     }
 
     @Test
-    void isGameComplete() {
+    void readGameFile() {
     }
 
     @Test
-    void getNextLevel() {
-    }
-
-    @Test
-    void getCurrentLevel() {
-    }
-
-    @Test
-    void toggleDebug() {
+    void prepareFileReader() {
     }
 }

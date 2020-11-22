@@ -1,8 +1,10 @@
-package Main;
+package Debug;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class GameLoggerTest {
 
@@ -15,14 +17,14 @@ class GameLoggerTest {
     }
 
     @Test
-    void info() {
+    void showInfo() {
     }
 
     @Test
-    void warning() {
+    void showWarning() {
     }
 
     @Test
-    void severe() {
+    void showSevere() {
     }
 }

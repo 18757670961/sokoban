@@ -1,12 +1,13 @@
 package Business;
 
+import Engine.GameEngine;
+
 import java.awt.*;
 import java.util.Iterator;
 
 public class GameGrid implements Iterable {
     final int COLUMNS;
     final int ROWS;
-
     private final GameObject[][] gameObjects;
 
     public GameGrid(int columns, int rows) {
