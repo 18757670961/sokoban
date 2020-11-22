@@ -26,10 +26,17 @@ public final class Level implements Iterable<GameObject> {
         int rows = rawLevel.size();
         int columns = rawLevel.get(0).trim().length();
 
-        objectsGrid = new GameGrid(rows, columns);
-        diamondsGrid = new GameGrid(rows, columns);
+        objectsGrid = createGrid(rows, columns);
+        diamondsGrid = createGrid(rows, columns);
 
         parseRawLevel(rawLevel); // method extracted
+    }
+
+    // factory method
+    private GameGrid createGrid(int rows, int columns) {
+        final GameGrid objectsGrid;
+        objectsGrid = new GameGrid(rows, columns);
+        return objectsGrid;
     }
 
     private void parseRawLevel(List<String> rawLevel) {

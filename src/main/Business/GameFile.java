@@ -15,6 +15,11 @@ public class GameFile {
     private FileChooser fileChooser;
 
     public GameFile() {
+        createFileChooser();
+    }
+
+    // factory method
+    private void createFileChooser() {
         fileChooser = new FileChooser();
     }
 
@@ -22,6 +27,7 @@ public class GameFile {
      * Save game file.
      */
     public void saveGameFile(Stage primaryStage) {
+        createFileChooser();
         fileChooser.setTitle("Save File to");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.skb"));
         fileChooser.setInitialDirectory(new File("./out/production/resources/level"));
@@ -46,17 +52,20 @@ public class GameFile {
      * @throws FileNotFoundException the file not found exception
      */
     public FileInputStream loadGameFile(Stage primaryStage) throws FileNotFoundException {
-        fileChooser = new FileChooser();
+        createFileChooser();
         fileChooser.setTitle("Open Save File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.skb"));
         fileChooser.setInitialDirectory(new File("./out/production/resources/level"));
         file = fileChooser.showOpenDialog(primaryStage);
 
-        if (file != null && GameEngine.isDebugActive()) {
-            GameLogger.showInfo("Loading save file: " + file.getName());
+        if (file != null) {
+            if (GameEngine.isDebugActive()) {
+                GameLogger.showInfo("Loading save file: " + file.getName());
+            }
+            return new FileInputStream(file);
         }
 
-        return new FileInputStream(file);
+        return null;
     }
 
     // accept parameter object fileInfo
@@ -65,7 +74,7 @@ public class GameFile {
             String line = fileInfo.reader.readLine();
 
             if (line == null) {
-                parseRawLevel(fileInfo);
+                parseFinalLevel(fileInfo);
                 break;
             }
 
@@ -88,7 +97,7 @@ public class GameFile {
     }
 
     // method extracted
-    private static void parseRawLevel(FileInfo fileInfo) {
+    private static void parseFinalLevel(FileInfo fileInfo) {
         if (fileInfo.rawLevel.size() != 0) {
             Level parsedLevel = new Level(fileInfo.levelName, ++fileInfo.levelIndex, fileInfo.rawLevel);
             fileInfo.levels.add(parsedLevel);
@@ -122,14 +131,14 @@ public class GameFile {
             boolean parsedFirstLevel = false;
             List<String> rawLevel = new ArrayList<>();
             String levelName = "";
-
             int levelIndex = 0;
             readGameFile(new FileInfo(levels, levelIndex, reader, parsedFirstLevel, rawLevel, levelName));
-
         } catch (IOException e) {
             GameLogger.showSevere("Error trying to load the game file: " + e);
+            System.out.println(e.getMessage());
         } catch (NullPointerException e) {
             GameLogger.showSevere("Cannot open the requested file: " + e);
+            System.out.println(e.getMessage());
         }
 
         return levels;

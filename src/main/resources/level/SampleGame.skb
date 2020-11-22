@@ -1,46 +1,46 @@
 MapSetName: Example Game!
 LevelName: Simple Start
 WWWWWWWWWWWWWWWWWWWW
-W    W             W 
+W    W             W
 W C  W D           W
-w    w      WWWWWWWW 
-w    WWWW  WWWWWWWWW 
-w            WWWWWWW 
-w    WWWWW   WWWWWWW 
-w    WWWWWWWWWWWWWWW 
-w    WWWWWWWWWWWWWWW 
-W    WWWWWWWWWWWWWWW 
-w    WWWWWWWWWWWWWWW 
-w           WWWWWWWW 
-w         WWWWWWWWWW 
-wWWWWWW   WWWWWWWWWW 
-wWWWWWW   WWWWWWWWWW 
+w    w      WWWWWWWW
+w    WWWW  WWWWWWWWW
+w            WWWWWWW
+w    WWWWW   WWWWWWW
+w    WWWWWWWWWWWWWWW
+w    WWWWWWWWWWWWWWW
+W    WWWWWWWWWWWWWWW
+w    WWWWWWWWWWWWWWW
+w           WWWWWWWW
+w         WWWWWWWWWW
 wWWWWWW   WWWWWWWWWW
-wWWWWWW   WWWWWWWWWW 
-wWWWWWW   WWWWWWWWWW 
+wWWWWWW   WWWWWWWWWW
+wWWWWWW   WWWWWWWWWW
+wWWWWWW   WWWWWWWWWW
+wWWWWWW   WWWWWWWWWW
 wWWWWWW   SWWWWWWWWW
 wwwwwwwwWwwwwwwwwwww
 
 LevelName: And Another Thing!
 WWWWWWWWWWWWWWWWWWWW
-W    W             W 
-W C  W C           W 
-w C  w      WW WWWWW 
-wD   WWWWWW W C   DW 
-w      D           W 
-w           W      W 
-w           WWWWWWWW 
-w           WWWWWWWW 
-w           WWWWWWWW 
-w           WWWWWWWW 
-w      S    WWWWWWWW 
-wW          WWWWWWWW 
-wWW       WWW  WWWWW 
-wWWW      W     WWWW 
-wWWWW     WD    WWWW 
-wWWWWW    WWWW WWWWW 
-wWWWWWW            W 
-wWWWWWWWWW         W 
+W    W             W
+W C  W C           W
+w C  w      WW WWWWW
+wD   WWWWWW W C   DW
+w      D           W
+w           W      W
+w           WWWWWWWW
+w           WWWWWWWW
+w           WWWWWWWW
+w           WWWWWWWW
+w      S    WWWWWWWW
+wW          WWWWWWWW
+wWW       WWW  WWWWW
+wWWW      W     WWWW
+wWWWW     WD    WWWW
+wWWWWW    WWWW WWWWW
+wWWWWWW            W
+wWWWWWWWWW         W
 wwwwwwwwwwwwwwwwwwww
 
 LevelName: Here's another

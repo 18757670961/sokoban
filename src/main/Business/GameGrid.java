@@ -11,11 +11,22 @@ public class GameGrid implements Iterable {
     private final GameObject[][] gameObjects;
 
     public GameGrid(int columns, int rows) {
+        if (columns <= 0 && rows <= 0) {
+            throw new IllegalArgumentException();
+        }
+
         COLUMNS = columns;
         ROWS = rows;
 
         // Initialize the array
+        gameObjects = createGrid();
+    }
+
+    // factory method
+    private GameObject[][] createGrid() {
+        final GameObject[][] gameObjects;
         gameObjects = new GameObject[COLUMNS][ROWS];
+        return gameObjects;
     }
 
     public static Point translatePoint(Point sourceLocation, Point delta) {
@@ -41,6 +52,7 @@ public class GameGrid implements Iterable {
         if (GameEngine.isDebugActive()) {
             System.out.printf("Trying to get null GameObject from COL: %d  ROW: %d", col, row);
         }
+
         throw new ArrayIndexOutOfBoundsException("The point [" + col + ":" + row + "] is outside the map.");
     }
 

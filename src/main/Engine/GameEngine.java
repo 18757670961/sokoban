@@ -99,7 +99,11 @@ public class GameEngine {
         }
 
         // method extracted
-        move(positionInfo);
+        try {
+            move(positionInfo);
+        } catch (AssertionError e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     // method extracted
@@ -188,10 +192,12 @@ public class GameEngine {
         if (currentLevel == null) {
             return levels.get(0);
         }
+
         int currentLevelIndex = currentLevel.getIndex();
         if (currentLevelIndex < levels.size()) {
-            return levels.get(currentLevelIndex + 1);
+            return levels.get(currentLevelIndex);
         }
+
         gameComplete = true;
         return null;
     }
