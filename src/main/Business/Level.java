@@ -1,4 +1,6 @@
-package com.ae2dms;
+package Business;
+
+import Engine.GameEngine;
 
 import java.awt.*;
 import java.util.Iterator;
@@ -19,7 +21,7 @@ public final class Level implements Iterable<GameObject> {
 
         name = levelName;
         index = levelIndex;
-        Point keeperPosition = new Point(0, 0);
+        keeperPosition = new Point(0, 0);
 
         int rows = rawLevel.size();
         int columns = rawLevel.get(0).trim().length();
@@ -27,10 +29,10 @@ public final class Level implements Iterable<GameObject> {
         objectsGrid = new GameGrid(rows, columns);
         diamondsGrid = new GameGrid(rows, columns);
 
-        setLevel(rawLevel); // method extracted
+        parseRawLevel(rawLevel); // method extracted
     }
 
-    private void setLevel(List<String> rawLevel) {
+    private void parseRawLevel(List<String> rawLevel) {
         for (int row = 0; row < rawLevel.size(); row++) {
             for (int col = 0; col < rawLevel.get(row).length(); col++) {
                 GameObject curTile = GameObject.toGameObject(rawLevel.get(row).charAt(col));

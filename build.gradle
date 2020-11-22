@@ -42,7 +42,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes "Main-Class": "main.com.ae2dms.Main"
+        attributes "Main-Class": "main.Main.Main"
     }
 
     from {
@@ -51,5 +51,5 @@ jar {
 }
 
 application {
-    mainClassName = 'main.com.ae2dms.Main'
+    mainClassName = 'main.Main.Main'
 }

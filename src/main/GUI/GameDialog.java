@@ -1,4 +1,4 @@
-package com.ae2dms;
+package GUI;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

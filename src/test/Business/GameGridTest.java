@@ -1,4 +1,4 @@
-package com.ae2dms;
+package Business;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,10 +34,6 @@ class GameGridTest {
 
     @Test
     void testGetGameObjectAt() {
-    }
-
-    @Test
-    void removeGameObjectAt() {
     }
 
     @Test

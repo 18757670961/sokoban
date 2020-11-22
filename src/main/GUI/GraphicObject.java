@@ -1,5 +1,8 @@
-package com.ae2dms;
+package GUI;
 
+import Engine.GameEngine;
+import Business.GameObject;
+import Debug.GameLogger;
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
@@ -7,8 +10,8 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-class GraphicObject extends Rectangle {
-    GraphicObject(GameObject obj) {
+public class GraphicObject extends Rectangle {
+    public GraphicObject(GameObject obj) {
         Paint color = setColor(obj);
 
         this.setFill(color);
@@ -44,7 +47,7 @@ class GraphicObject extends Rectangle {
             case CRATE_ON_DIAMOND -> color = Color.DARKCYAN;
             default -> {
                 String message = "Error in Level constructor. Object not recognized.";
-                GameEngine.getLogger().severe(message);
+                GameLogger.showSevere(message);
                 throw new AssertionError(message);
             }
         }

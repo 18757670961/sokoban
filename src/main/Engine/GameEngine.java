@@ -1,13 +1,14 @@
-package com.ae2dms;
+package Engine;
 
+import Business.GameFile;
+import Business.GameGrid;
+import Business.GameObject;
+import Business.Level;
+import Debug.GameLogger;
 import javafx.scene.input.KeyCode;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,7 +19,6 @@ import java.util.NoSuchElementException;
 public class GameEngine {
     // transfer public fields to private
     private static final String GAME_NAME = "Sokoban";
-    private static GameLogger logger;
     private static boolean debug = false;
     private int movesCount = 0;
     private static String mapSetName;
@@ -34,14 +34,11 @@ public class GameEngine {
      */
     public GameEngine(InputStream input, boolean production) {
         try {
-            logger = new GameLogger();
             levels = GameFile.prepareFileReader(input);
             currentLevel = getNextLevel();
             gameComplete = false;
-        } catch (IOException e) {
-            System.out.println("Cannot create logger.");
         } catch (NoSuchElementException e) {
-            logger.warning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
+            GameLogger.showWarning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -62,13 +59,13 @@ public class GameEngine {
     public void handleKey(KeyCode code) {
         // switch replaced with enhanced switch
         switch (code) {
-            case UP -> move(new Point(-1, 0));
+            case UP -> getPositionInfo(new Point(-1, 0));
 
-            case RIGHT -> move(new Point(0, 1));
+            case RIGHT -> getPositionInfo(new Point(0, 1));
 
-            case DOWN -> move(new Point(1, 0));
+            case DOWN -> getPositionInfo(new Point(1, 0));
 
-            case LEFT -> move(new Point(0, -1));
+            case LEFT -> getPositionInfo(new Point(0, -1));
 
             default -> {
             }
@@ -85,69 +82,77 @@ public class GameEngine {
      *
      * @param delta the delta
      */
-    private void move(Point delta) {
+    private void getPositionInfo(Point delta) {
         if (isGameComplete()) {
             return;
         }
 
         Point keeperPosition = currentLevel.getKeeperPosition();
         GameObject keeper = currentLevel.objectsGrid.getGameObjectAt(keeperPosition);
+        boolean keeperMoved = false;
         Point targetObjectPoint = GameGrid.translatePoint(keeperPosition, delta);
         GameObject keeperTarget = currentLevel.objectsGrid.getGameObjectAt(targetObjectPoint);
+        PositionInfo positionInfo = new PositionInfo(delta, keeperPosition, keeper, keeperMoved, targetObjectPoint, keeperTarget);
 
         if (GameEngine.isDebugActive()) {
-            System.out.println("Current level state:");
-            System.out.println(currentLevel.toString());
-            System.out.println("Keeper pos: " + keeperPosition);
-            System.out.println("Movement source obj: " + keeper);
-            System.out.printf("Target object: %s at [%s]", keeperTarget, targetObjectPoint);
+            printState(positionInfo);
         }
 
         // method extracted
-        moveKeeper(delta, keeperPosition, keeper, targetObjectPoint, keeperTarget);
+        move(positionInfo);
     }
 
-    private void moveKeeper(Point delta, Point keeperPosition, GameObject keeper, Point targetObjectPoint, GameObject keeperTarget) {
-        boolean keeperMoved = false;
+    // method extracted
+    private void printState(PositionInfo positionInfo) {
+        System.out.println("Current level state:");
+        System.out.println(currentLevel.toString());
+        System.out.println("Keeper pos: " + positionInfo.getKeeperPosition());
+        System.out.println("Movement source obj: " + positionInfo.getKeeper());
+        System.out.printf("Target object: %s at [%s]", positionInfo.getKeeperTarget(), positionInfo.getTargetObjectPoint());
+    }
+
+    // accept parameter object positionInfo
+    private void move(PositionInfo positionInfo) {
 
         // switch replaced with enhanced switch
-        switch (keeperTarget) {
+        switch (positionInfo.getKeeperTarget()) {
 
             case WALL -> {
             }
 
             case CRATE -> {
-                GameObject crateTarget = currentLevel.getTargetObject(targetObjectPoint, delta);
+                GameObject crateTarget = currentLevel.getTargetObject(positionInfo.getTargetObjectPoint(), positionInfo.getDelta());
                 if (crateTarget != GameObject.FLOOR) {
                     break;
                 }
 
-                moveTargetCrate(delta, keeperPosition, keeper, targetObjectPoint, keeperTarget);
-                keeperMoved = true;
+                moveObject(positionInfo.getDelta(), positionInfo.getTargetObjectPoint(), positionInfo.getKeeperTarget());
+                moveObject(positionInfo.getDelta(), positionInfo.getKeeperPosition(), positionInfo.getKeeper());
+                positionInfo.setKeeperMoved(true);
             }
 
             case FLOOR -> {
-                moveTargetFloor(delta, keeperPosition, keeper);
-                keeperMoved = true;
+                moveObject(positionInfo.getDelta(), positionInfo.getKeeperPosition(), positionInfo.getKeeper());
+                positionInfo.setKeeperMoved(true);
                 break;
             }
 
             default -> {
-                logger.severe("The object to be moved was not a recognised GameObject.");
+                GameLogger.showSevere("The object to be moved was not a recognised GameObject.");
                 throw new AssertionError("This should not have happened. Report this problem to the developer.");
             }
 
         }
 
-        checkKeeperPosition(delta, keeperPosition, keeperMoved);
+        checkKeeperPosition(positionInfo);
     }
 
-    private void checkKeeperPosition(Point delta, Point keeperPosition, boolean keeperMoved) {
+    private void checkKeeperPosition(PositionInfo positionInfo) {
         // if structure improved
-        if (!keeperMoved)
+        if (!positionInfo.isKeeperMoved())
             return;
 
-        keeperPosition.translate((int) delta.getX(), (int) delta.getY());
+        positionInfo.getKeeperPosition().translate((int) positionInfo.getDelta().getX(), (int) positionInfo.getDelta().getY());
         movesCount++;
 
         if (!currentLevel.isComplete())
@@ -160,14 +165,9 @@ public class GameEngine {
         currentLevel = getNextLevel();
     }
 
-    private void moveTargetFloor(Point delta, Point keeperPosition, GameObject keeper) {
+    private void moveObject(Point delta, Point keeperPosition, GameObject keeper) {
         currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
         currentLevel.objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
-    }
-
-    private void moveTargetCrate(Point delta, Point keeperPosition, GameObject keeper, Point targetObjectPoint, GameObject keeperTarget) {
-        moveTargetFloor(delta, targetObjectPoint, keeperTarget);
-        moveTargetFloor(delta, keeperPosition, keeper);
     }
 
     /**
@@ -216,10 +216,6 @@ public class GameEngine {
         return GAME_NAME;
     }
 
-    public static GameLogger getLogger() {
-        return logger;
-    }
-
     public int getMovesCount() {
         return movesCount;
     }
@@ -235,4 +231,5 @@ public class GameEngine {
     public final List<Level> getLevels() {
         return levels;
     }
+
 }

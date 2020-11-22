@@ -1,4 +1,4 @@
-package com.ae2dms;
+package Business;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GameLoggerTest {
+class GameFileTest {
 
     @BeforeEach
     void setUp() {
@@ -17,14 +17,18 @@ class GameLoggerTest {
     }
 
     @Test
-    void info() {
+    void saveGameFile() {
     }
 
     @Test
-    void warning() {
+    void loadGameFile() {
     }
 
     @Test
-    void severe() {
+    void readGameFile() {
+    }
+
+    @Test
+    void prepareFileReader() {
     }
 }

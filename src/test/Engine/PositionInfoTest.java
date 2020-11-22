@@ -1,4 +1,4 @@
-package com.ae2dms;
+package Engine;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class LevelTest {
+class PositionInfoTest {
 
     @BeforeEach
     void setUp() {
@@ -17,30 +17,30 @@ class LevelTest {
     }
 
     @Test
-    void isComplete() {
-    }
-
-    @Test
-    void getName() {
-    }
-
-    @Test
-    void getIndex() {
-    }
-
-    @Test
     void getKeeperPosition() {
     }
 
     @Test
-    void getTargetObject() {
+    void getKeeper() {
     }
 
     @Test
-    void testToString() {
+    void isKeeperMoved() {
     }
 
     @Test
-    void iterator() {
+    void setKeeperMoved() {
+    }
+
+    @Test
+    void getDelta() {
+    }
+
+    @Test
+    void getTargetObjectPoint() {
+    }
+
+    @Test
+    void getKeeperTarget() {
     }
 }

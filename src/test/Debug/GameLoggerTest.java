@@ -1,4 +1,4 @@
-package com.ae2dms;
+package Debug;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GameEngineTest {
+class GameLoggerTest {
 
     @BeforeEach
     void setUp() {
@@ -17,26 +17,14 @@ class GameEngineTest {
     }
 
     @Test
-    void isDebugActive() {
+    void showInfo() {
     }
 
     @Test
-    void handleKey() {
+    void showWarning() {
     }
 
     @Test
-    void isGameComplete() {
-    }
-
-    @Test
-    void getNextLevel() {
-    }
-
-    @Test
-    void getCurrentLevel() {
-    }
-
-    @Test
-    void toggleDebug() {
+    void showSevere() {
     }
 }
