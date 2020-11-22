@@ -23,7 +23,7 @@ public class GraphicObject extends Rectangle {
             this.setArcWidth(50);
         }
 
-        if (GameEngine.isDebugActive()) {
+        if (GameLogger.isDebugActive()) {
             this.setStroke(Color.RED);
             this.setStrokeWidth(0.25);
         }
@@ -38,7 +38,7 @@ public class GraphicObject extends Rectangle {
             case CRATE -> color = Color.ORANGE;
             case DIAMOND -> {
                 color = Color.DEEPSKYBLUE;
-                if (GameEngine.isDebugActive()) {
+                if (GameLogger.isDebugActive()) {
                     setTransition();
                 }
             }

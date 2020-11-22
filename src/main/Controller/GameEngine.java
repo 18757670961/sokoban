@@ -17,16 +17,19 @@ import java.util.NoSuchElementException;
 /**
  * The type Game engine.
  */
-public class GameEngine implements Serializable {
+/**
+ * singleton class
+ */
+public final class GameEngine implements Serializable {
     // transfer public fields to private
-    private static final String GAME_NAME = "Sokoban";
-    private static boolean debug = false;
+    private static GameEngine gameEngine;
+    private final String GAME_NAME = "Sokoban";
+    private String mapSetName = "";
     private int movesCount = 0;
-    private static String mapSetName;
-    private Level currentLevel;
-    private List<Level> levels;
-    private Level[] serializableLevels;
-    private boolean gameComplete;
+    private Level currentLevel = null;
+    private List<Level> levels = null;
+    private Level[] serializableLevels = {};
+    private boolean gameComplete = false;
 
     /**
      * Instantiates a new Game engine.
@@ -34,23 +37,37 @@ public class GameEngine implements Serializable {
      * @param input      the input
      * @param production the production
      */
-    public GameEngine(InputStream input) {
+    private GameEngine() {}
+
+    private void parseFile(InputStream input) {
         try {
             levels = GameFile.prepareFileReader(input);
             currentLevel = getNextLevel();
-            gameComplete = false;
         } catch (NoSuchElementException e) {
             GameLogger.showWarning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
+    public static void createGameEngine(InputStream input) {
+        gameEngine = new GameEngine();
+        gameEngine.parseFile(input);
+    }
+
+    public static void createGameEngine(GameEngine engine) {
+        gameEngine = engine;
+    }
+
+    public static GameEngine getGameEngine() {
+        return gameEngine;
+    }
+
     /**
-     * Is debug active boolean.
+     * Is game complete boolean.
      *
      * @return the boolean
      */
-    public static boolean isDebugActive() {
-        return debug;
+    public boolean isGameComplete() {
+        return gameComplete;
     }
 
     /**
@@ -78,7 +95,7 @@ public class GameEngine implements Serializable {
             // TODO: implement something funny.
         }
 
-        if (isDebugActive()) {
+        if (GameLogger.isDebugActive()) {
             System.out.println(code);
         }
     }
@@ -100,7 +117,7 @@ public class GameEngine implements Serializable {
         GameObject keeperTarget = currentLevel.objectsGrid.getGameObjectAt(targetObjectPoint);
         PositionInfo positionInfo = new PositionInfo(delta, keeperPosition, keeper, keeperMoved, targetObjectPoint, keeperTarget);
 
-        if (GameEngine.isDebugActive()) {
+        if (GameLogger.isDebugActive()) {
             printState(positionInfo);
         }
 
@@ -168,7 +185,7 @@ public class GameEngine implements Serializable {
         if (!currentLevel.isComplete())
             return;
 
-        if (isDebugActive()) {
+        if (GameLogger.isDebugActive()) {
             System.out.println("Level complete!");
         }
 
@@ -178,15 +195,6 @@ public class GameEngine implements Serializable {
     private void moveObject(Point delta, Point keeperPosition, GameObject keeper) {
         currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
         currentLevel.objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
-    }
-
-    /**
-     * Is game complete boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isGameComplete() {
-        return gameComplete;
     }
 
     /**
@@ -209,13 +217,6 @@ public class GameEngine implements Serializable {
     }
 
     /**
-     * Toggle debug.
-     */
-    public void toggleDebug() {
-        debug = !debug;
-    }
-
-    /**
      * Gets current level.
      *
      * @return the current level
@@ -224,11 +225,11 @@ public class GameEngine implements Serializable {
         return currentLevel;
     }
 
-    public void setCurrentLevel(Level currentLevel) {
-        this.currentLevel = currentLevel;
+    public void setCurrentLevel(Level level) {
+        currentLevel = level;
     }
 
-    public static String getGameName() {
+    public String getGameName() {
         return GAME_NAME;
     }
 
@@ -236,11 +237,11 @@ public class GameEngine implements Serializable {
         return movesCount;
     }
 
-    public static String getMapSetName() {
+    public String getMapSetName() {
         return mapSetName;
     }
 
-    public static void setMapSetName(String name) {
+    public void setMapSetName(String name) {
         mapSetName = name;
     }
 
@@ -248,15 +249,28 @@ public class GameEngine implements Serializable {
         return levels;
     }
 
-    public void setLevels(List<Level> levels) {
-        this.levels = levels;
+    public void setLevels(List<Level> newLevels) {
+        levels = newLevels;
     }
 
     public Level[] getSerializableLevels() {
         return serializableLevels;
     }
 
-    public void setSerializableLevels(Level[] serializableLevels) {
-        this.serializableLevels = serializableLevels;
+    public void setSerializableLevels(Level[] levels) {
+        serializableLevels = levels;
     }
+
+    @Override
+    public String toString() {
+        return "GameEngine:" + "\n" + currentLevel + "\n" + levels + "\n" + movesCount + "\n";
+    }
+
+    /**
+     * avoid singleton destroyed by serialization
+     * @return
+     */
+//    private Object readResolve() {
+//        return gameEngine;
+//    }
 }

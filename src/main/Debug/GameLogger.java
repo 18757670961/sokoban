@@ -1,6 +1,7 @@
 package Debug;
 
 import Controller.GameEngine;
+import Modal.GameFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,14 +21,15 @@ public final class GameLogger extends Logger {
     private static final Logger logger = Logger.getLogger("GameLogger");
     private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private static final Calendar calendar = Calendar.getInstance();
+    private static boolean debug = false;
 
     private GameLogger() throws IOException {
         super("Sokoban", null);
 
-        File directory = new File("./logs");
+        File directory = GameFile.loadFile("./logs");
         directory.mkdirs();
 
-        FileHandler fileHandler = new FileHandler(directory + "/" + GameEngine.getGameName() + ".log"); // variable name changed
+        FileHandler fileHandler = new FileHandler(directory + "/" + GameEngine.getGameEngine().getGameEngine().getGameName() + ".log"); // variable name changed
         logger.addHandler(fileHandler);
         SimpleFormatter formatter = new SimpleFormatter();
         fileHandler.setFormatter(formatter);
@@ -53,5 +55,21 @@ public final class GameLogger extends Logger {
 
     public static void showSevere(String message) {
         logger.severe(createFormattedMessage(message));
+    }
+
+    /**
+     * Is debug active boolean.
+     *
+     * @return the boolean
+     */
+    public static boolean isDebugActive() {
+        return debug;
+    }
+
+    /**
+     * Toggle debug.
+     */
+    public static void toggleDebug() {
+        debug = !debug;
     }
 }

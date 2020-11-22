@@ -1,6 +1,7 @@
 package Modal;
 
 import Controller.GameEngine;
+import Debug.GameLogger;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -16,7 +17,7 @@ public final class Level implements Iterable<GameObject>, Serializable {
     private Point keeperPosition;
 
     public Level(String levelName, int levelIndex, List<String> rawLevel) {
-        if (GameEngine.isDebugActive()) {
+        if (GameLogger.isDebugActive()) {
             System.out.printf("[ADDING LEVEL] LEVEL [%d]: %s\n", levelIndex, levelName);
         }
 

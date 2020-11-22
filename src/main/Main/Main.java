@@ -12,7 +12,6 @@ import java.io.InputStream;
  */
 public class Main extends Application {
     private GameWindow gameWindow;
-    private String defaultSaveFile = "level/sampleGame.skb";
 
     /**
      * The entry point of application.
@@ -25,19 +24,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        GameLogger.createLogger();
         gameWindow = new GameWindow(primaryStage);
-        loadDefaultSaveFile();
-    }
-
-    /**
-     * Load default save file.
-     *
-     * @param primaryStage the primary stage
-     */
-    private void loadDefaultSaveFile() {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(defaultSaveFile); // variable name changed
-        gameWindow.initializeGame(inputStream);
-        gameWindow.setEventFilter();
+        GameLogger.createLogger();
     }
 }

@@ -10,39 +10,38 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * singleton class
+ */
 // game file IO extracted
-public class GameFile {
-    private File file;
-    private FileChooser fileChooser;
-
-    public GameFile() {
-        createFileChooser();
-    }
+public final class GameFile {
+    private static FileChooser fileChooser;
 
     // factory method
-    private void createFileChooser() {
+    public static void createFileChooser() {
         fileChooser = new FileChooser();
     }
+    public static File loadFile(String uri) { return new File(uri); }
 
     /**
      * Save game file.
      */
-    public void saveGameFile(Stage primaryStage, GameEngine gameEngine) {
+    public static void saveGameFile(Stage primaryStage) {
         createFileChooser();
         fileChooser.setTitle("Save File to");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.dat"));
-        fileChooser.setInitialDirectory(new File("./src/main/resources/level"));
-        file = fileChooser.showSaveDialog(primaryStage);
+        fileChooser.setInitialDirectory(loadFile("./src/main/resources/level"));
+        File file = fileChooser.showSaveDialog(primaryStage);
 
         if (file != null) {
-            if (GameEngine.isDebugActive()) {
+            if (GameLogger.isDebugActive()) {
                 GameLogger.showInfo("Saving file: " + file.getName());
             }
 
             try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file)))
             {
                 // serialize gameEngine
-                serialize(gameEngine, out);
+                serialize(out);
             }
             catch (IOException e)
             {
@@ -51,12 +50,12 @@ public class GameFile {
         }
     }
 
-    private void serialize(GameEngine gameEngine, ObjectOutputStream out) throws IOException {
-        List<Level> levelList = gameEngine.getLevels();
+    private static void serialize(ObjectOutputStream out) throws IOException {
+        List<Level> levelList = GameEngine.getGameEngine().getLevels();
         Level[] levelArray = new Level[levelList.size()];
         levelList.toArray(levelArray);
-        gameEngine.setSerializableLevels(levelArray); // level list -> level array
-        out.writeObject(gameEngine);
+        GameEngine.getGameEngine().setSerializableLevels(levelArray); // level list -> level array
+        out.writeObject(GameEngine.getGameEngine());
     }
 
     /**
@@ -64,15 +63,15 @@ public class GameFile {
      *
      * @throws FileNotFoundException the file not found exception
      */
-    public Object loadGameFile(Stage primaryStage) throws FileNotFoundException {
+    public static Object loadGameFile(Stage primaryStage) throws FileNotFoundException {
         createFileChooser();
         fileChooser.setTitle("Open Save File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.skb", "*.dat"));
-        fileChooser.setInitialDirectory(new File("./src/main/resources/level"));
-        file = fileChooser.showOpenDialog(primaryStage);
+        fileChooser.setInitialDirectory(loadFile("./src/main/resources/level"));
+        File file = fileChooser.showOpenDialog(primaryStage);
 
         if (file != null) {
-            if (GameEngine.isDebugActive()) {
+            if (GameLogger.isDebugActive()) {
                 GameLogger.showInfo("Loading save file: " + file.getName());
             }
 
@@ -99,7 +98,7 @@ public class GameFile {
         return null;
     }
 
-    private GameEngine deserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private static GameEngine deserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameEngine gameEngine = (GameEngine) in.readObject();
         gameEngine.setLevels(Arrays.asList(gameEngine.getSerializableLevels())); // level array -> level list
         gameEngine.setSerializableLevels(null); // clean up level array
@@ -117,7 +116,7 @@ public class GameFile {
             }
 
             if (line.contains("MapSetName")) {
-                GameEngine.setMapSetName(line.replace("MapSetName: ", ""));
+                GameEngine.getGameEngine().setMapSetName(line.replace("MapSetName: ", ""));
                 continue;
             }
 

@@ -1,6 +1,7 @@
 package Modal;
 
 import Controller.GameEngine;
+import Debug.GameLogger;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -46,7 +47,7 @@ public class GameGrid implements Iterable, Serializable {
             return gameObjects[col][row];
         }
 
-        if (GameEngine.isDebugActive()) {
+        if (GameLogger.isDebugActive()) {
             System.out.printf("Trying to get null GameObject from COL: %d  ROW: %d", col, row);
         }
 
