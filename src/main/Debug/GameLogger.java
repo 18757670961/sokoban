@@ -17,16 +17,36 @@ import java.util.logging.SimpleFormatter;
  */
 public final class GameLogger extends Logger {
 
+    /**
+     * The constant gameLogger.
+     */
     private static GameLogger gameLogger;
+    /**
+     * The constant logger.
+     */
     private static final Logger logger = Logger.getLogger("GameLogger");
+    /**
+     * The constant dateFormat.
+     */
     private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    /**
+     * The constant calendar.
+     */
     private static final Calendar calendar = Calendar.getInstance();
+    /**
+     * The constant debug.
+     */
     private static boolean debug = false;
 
+    /**
+     * Instantiates a new Game logger.
+     *
+     * @throws IOException the io exception
+     */
     private GameLogger() throws IOException {
         super("Sokoban", null);
 
-        File directory = GameFile.loadFile("./logs");
+        File directory = GameFile.getFile("./logs");
         directory.mkdirs();
 
         FileHandler fileHandler = new FileHandler(directory + "/" + GameEngine.getGameEngine().getGameEngine().getGameName() + ".log"); // variable name changed
@@ -35,24 +55,50 @@ public final class GameLogger extends Logger {
         fileHandler.setFormatter(formatter);
     }
 
+    /**
+     * Create logger.
+     *
+     * @throws IOException the io exception
+     */
     public static void createLogger() throws IOException {
         if (gameLogger == null) {
             gameLogger = new GameLogger();
         }
     }
 
+    /**
+     * Create formatted message string.
+     *
+     * @param message the message
+     * @return the string
+     */
     private static String createFormattedMessage(String message) {
         return dateFormat.format(calendar.getTime()) + " -- " + message;
     }
 
+    /**
+     * Show info.
+     *
+     * @param message the message
+     */
     public static void showInfo(String message) {
         logger.info(createFormattedMessage(message));
     }
 
+    /**
+     * Show warning.
+     *
+     * @param message the message
+     */
     public static void showWarning(String message) {
         logger.warning(createFormattedMessage(message));
     }
 
+    /**
+     * Show severe.
+     *
+     * @param message the message
+     */
     public static void showSevere(String message) {
         logger.severe(createFormattedMessage(message));
     }

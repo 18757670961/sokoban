@@ -4,6 +4,7 @@ import Controller.GameEngine;
 import Debug.GameLogger;
 import Modal.GameFile;
 import Modal.GameObject;
+import Modal.HighestScore;
 import Modal.Level;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
@@ -20,38 +21,51 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 
+/**
+ * The type Game window.
+ */
 // GUI class extracted
 public class GameWindow {
-    private Stage primaryStage;
-    private GridPane gameGrid;
-    private GridPane root;
-    private MenuBar menu;
-    private MediaPlayer mp = new MediaPlayer(new Media(GameFile.loadFile("src/main/resources/music/bgm.wav").toURI().toString()));
-    private String defaultSaveFile = "level/sampleGame.skb";
-
-    public GameWindow(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        loadDefaultSaveFile();
-        createMenu();
-        createPane();
-        setEventFilter();
-        mp.setCycleCount(MediaPlayer.INDEFINITE);
-        reloadGrid();
-    }
+    /**
+     * The Primary stage.
+     */
+    private static Stage primaryStage;
+    /**
+     * The Game grid.
+     */
+    private static GridPane gameGrid;
+    /**
+     * The Root.
+     */
+    private static GridPane root;
+    /**
+     * The Menu.
+     */
+    private static MenuBar menu;
+    /**
+     * The Mp.
+     */
+    private static MediaPlayer mediaPlayer = new MediaPlayer(new Media(GameFile.getFile("src/main/resources/music/bgm.wav").toURI().toString()));
 
     /**
-     * Load default save file.
+     * Instantiates a new Game window.
      *
      * @param primaryStage the primary stage
      */
-    private void loadDefaultSaveFile() {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(defaultSaveFile); // variable name changed
-        GameEngine.createGameEngine(inputStream);
+    public static void createGameWindow(Stage ps) {
+        primaryStage = ps;
+        createMenu();
+        createPane();
+        setEventFilter();
+        reloadGrid();
+        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
     }
 
-    private void createMenu() {
+    /**
+     * Create menu.
+     */
+    private static void createMenu() {
         menu = new MenuBar();
         Menu menuFile = createMenuFile();
         Menu menuLevel = createMenuLevel();
@@ -64,7 +78,7 @@ public class GameWindow {
      *
      * @return the menu
      */
-    private Menu createMenuAbout() {
+    private static Menu createMenuAbout() {
         MenuItem menuItemAbout = new MenuItem("About This Game");
         menuItemAbout.setOnAction(actionEvent -> showAbout());
         Menu menuAbout = new Menu("About");
@@ -77,7 +91,7 @@ public class GameWindow {
      *
      * @return the menu
      */
-    private Menu createMenuLevel() {
+    private static Menu createMenuLevel() {
         MenuItem menuItemUndo = new MenuItem("Undo");
         menuItemUndo.setOnAction(actionEvent -> undo());
         RadioMenuItem radioMenuItemMusic = new RadioMenuItem("Toggle Music");
@@ -97,7 +111,7 @@ public class GameWindow {
      *
      * @return the menu
      */
-    private Menu createMenuFile() {
+    private static Menu createMenuFile() {
         MenuItem menuItemSaveGame = new MenuItem("Save Game");
         menuItemSaveGame.setOnAction(actionEvent -> saveGame());
         MenuItem menuItemLoadGame = new MenuItem("Load Game");
@@ -109,7 +123,10 @@ public class GameWindow {
         return menuFile;
     }
 
-    private void createPane() {
+    /**
+     * Create pane.
+     */
+    private static void createPane() {
         gameGrid = new GridPane();
         root = new GridPane();
         root.add(menu, 0, 0);
@@ -120,28 +137,9 @@ public class GameWindow {
     }
 
     /**
-     * Initialize game.
-     *
-     */
-    public void initializeGame(GameEngine gameEngine) {
-        GameEngine.createGameEngine(gameEngine);
-        reloadGrid();
-    }
-
-    /**
-     * Initialize game.
-     *
-     * @param input the input
-     */
-    public void initializeGame(InputStream input) {
-        GameEngine.createGameEngine(input);
-        reloadGrid();
-    }
-
-    /**
      * Sets event filter.
      */
-    public void setEventFilter() {
+    public static void setEventFilter() {
         primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             GameEngine.getGameEngine().handleKey(event.getCode());
             reloadGrid();
@@ -151,7 +149,7 @@ public class GameWindow {
     /**
      * Reload grid.
      */
-    private void reloadGrid() {
+    private static void reloadGrid() {
         if (GameEngine.getGameEngine().isGameComplete()) {
             showVictoryMessage();
             return;
@@ -172,7 +170,7 @@ public class GameWindow {
     /**
      * Show victory message.
      */
-    private void showVictoryMessage() {
+    private static void showVictoryMessage() {
         String dialogTitle = "Game Over!";
         String dialogMessage = "You completed " + GameEngine.getGameEngine().getMapSetName() + " in " + GameEngine.getGameEngine().getMovesCount() + " moves!";
         MotionBlur motionBlur = new MotionBlur(2, 3); // vairable name changed
@@ -186,7 +184,7 @@ public class GameWindow {
      * @param gameObject the game object
      * @param location   the location
      */
-    private void addObjectToGrid(GameObject gameObject, Point location) {
+    private static void addObjectToGrid(GameObject gameObject, Point location) {
         GraphicObject graphicObject = new GraphicObject(gameObject);
         gameGrid.add(graphicObject, location.y, location.x);
     }
@@ -194,31 +192,32 @@ public class GameWindow {
     /**
      * Close game.
      */
-    private void closeGame() {
+    private static void closeGame() {
         System.exit(0);
     }
 
     /**
      * Save game.
      */
-    public void saveGame() {
+    public static void saveGame() {
         GameFile.saveGameFile(primaryStage);
     }
 
     /**
      * Load game.
      */
-    public void loadGame() {
+    public static void loadGame() {
         try {
             Object fileInput;
             fileInput = GameFile.loadGameFile(primaryStage);
 
             if (fileInput != null) {
                 if (fileInput instanceof GameEngine) {
-                    initializeGame((GameEngine) fileInput);
+                    GameEngine.createGameEngine((GameEngine) fileInput);
                 } else {
-                    initializeGame((FileInputStream) fileInput);
+                    GameEngine.createGameEngine((FileInputStream) fileInput);
                 }
+                reloadGrid();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -228,14 +227,14 @@ public class GameWindow {
     /**
      * Undo.
      */
-    private void undo() {
+    private static void undo() {
         closeGame();
     }
 
     /**
      * Reset level.
      */
-    private void resetLevel() {
+    private static void resetLevel() {
         //gameEngine.setCurrentLevel(gameEngine.getSerializableLevels()[gameEngine.getCurrentLevel().getIndex()]);
         reloadGrid();
     }
@@ -243,28 +242,35 @@ public class GameWindow {
     /**
      * Show about.
      */
-    private void showAbout() {
+    private static void showAbout() {
         String title = "About this game";
         String message = "Game created by Shuguang LYU (Desmond)\n";
+        GameDialog dialog = new GameDialog(primaryStage, title, message, null);
+    }
 
+    public static void showHighestScore() {
+        String title = "Good Job !";
+        String message = "Level completed: " + GameEngine.getGameEngine().getCurrentLevel().getName() +
+                "\n\n" + "Highest score: " + HighestScore.getHighestScore(GameEngine.getGameEngine().getCurrentLevel().getIndex()) + " moves\n\n"
+                + "Your score: " + GameEngine.getGameEngine().getMovesCount() + " moves";
         GameDialog dialog = new GameDialog(primaryStage, title, message, null);
     }
 
     /**
      * Toggle music.
      */
-    private void toggleMusic() {
-        if (mp.getStatus() == MediaPlayer.Status.PLAYING) {
-            mp.pause();
+    private static void toggleMusic() {
+        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            mediaPlayer.pause();
         } else {
-            mp.play();
+            mediaPlayer.play();
         }
     }
 
     /**
      * Toggle debug.
      */
-    private void toggleDebug() {
+    private static void toggleDebug() {
         GameLogger.toggleDebug();
         reloadGrid();
     }

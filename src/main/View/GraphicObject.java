@@ -10,7 +10,15 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
+/**
+ * The type Graphic object.
+ */
 public class GraphicObject extends Rectangle {
+    /**
+     * Instantiates a new Graphic object.
+     *
+     * @param obj the obj
+     */
     public GraphicObject(GameObject obj) {
         Paint color = setColor(obj);
 
@@ -29,6 +37,12 @@ public class GraphicObject extends Rectangle {
         }
     }
 
+    /**
+     * Sets color.
+     *
+     * @param obj the obj
+     * @return the color
+     */
     private Paint setColor(GameObject obj) {
         Paint color;
 
@@ -54,7 +68,10 @@ public class GraphicObject extends Rectangle {
         return color;
     }
 
-    // method extracted
+    /**
+     * Sets transition.
+     */
+// method extracted
     private void setTransition() {
         FadeTransition fadeTransition = new FadeTransition(Duration.millis(1000), this); // variable name changed
         fadeTransition.setFromValue(1.0);

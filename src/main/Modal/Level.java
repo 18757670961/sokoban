@@ -8,14 +8,42 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * The type Level.
+ */
 public final class Level implements Iterable<GameObject>, Serializable {
+    /**
+     * The Objects grid.
+     */
     public final GameGrid objectsGrid;
+    /**
+     * The Diamonds grid.
+     */
     public final GameGrid diamondsGrid;
+    /**
+     * The Name.
+     */
     private final String name;
+    /**
+     * The Index.
+     */
     private final int index;
+    /**
+     * The Number of diamonds.
+     */
     private int numberOfDiamonds = 0;
+    /**
+     * The Keeper position.
+     */
     private Point keeperPosition;
 
+    /**
+     * Instantiates a new Level.
+     *
+     * @param levelName  the level name
+     * @param levelIndex the level index
+     * @param rawLevel   the raw level
+     */
     public Level(String levelName, int levelIndex, List<String> rawLevel) {
         if (GameLogger.isDebugActive()) {
             System.out.printf("[ADDING LEVEL] LEVEL [%d]: %s\n", levelIndex, levelName);
@@ -34,13 +62,25 @@ public final class Level implements Iterable<GameObject>, Serializable {
         parseRawLevel(rawLevel); // method extracted
     }
 
-    // factory method
+    /**
+     * Create grid game grid.
+     *
+     * @param rows    the rows
+     * @param columns the columns
+     * @return the game grid
+     */
+// factory method
     private GameGrid createGrid(int rows, int columns) {
         final GameGrid objectsGrid;
         objectsGrid = new GameGrid(rows, columns);
         return objectsGrid;
     }
 
+    /**
+     * Parse raw level.
+     *
+     * @param rawLevel the raw level
+     */
     private void parseRawLevel(List<String> rawLevel) {
         for (int row = 0; row < rawLevel.size(); row++) {
             for (int col = 0; col < rawLevel.get(row).length(); col++) {
@@ -60,6 +100,11 @@ public final class Level implements Iterable<GameObject>, Serializable {
         }
     }
 
+    /**
+     * Is complete boolean.
+     *
+     * @return the boolean
+     */
     public boolean isComplete() {
         int cratedDiamondsCount = 0;
         for (int row = 0; row < objectsGrid.ROWS; row++) {
@@ -73,26 +118,62 @@ public final class Level implements Iterable<GameObject>, Serializable {
         return cratedDiamondsCount >= numberOfDiamonds;
     }
 
+    /**
+     * Gets diamond.
+     *
+     * @param row the row
+     * @param col the col
+     * @return the diamond
+     */
     private GameObject getDiamond(int row, int col) {
         return diamondsGrid.getGameObjectAt(col, row);
     }
 
+    /**
+     * Gets object.
+     *
+     * @param row the row
+     * @param col the col
+     * @return the object
+     */
     private GameObject getObject(int row, int col) {
         return objectsGrid.getGameObjectAt(col, row);
     }
 
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets index.
+     *
+     * @return the index
+     */
     public int getIndex() {
         return index;
     }
 
+    /**
+     * Gets keeper position.
+     *
+     * @return the keeper position
+     */
     public Point getKeeperPosition() {
         return keeperPosition;
     }
 
+    /**
+     * Gets target object.
+     *
+     * @param source the source
+     * @param delta  the delta
+     * @return the target object
+     */
     public GameObject getTargetObject(Point source, Point delta) {
         return objectsGrid.getTargetFromSource(source, delta);
     }
@@ -107,9 +188,18 @@ public final class Level implements Iterable<GameObject>, Serializable {
         return new LevelIterator();
     }
 
+    /**
+     * The type Level iterator.
+     */
     public class LevelIterator implements Iterator<GameObject> {
 
+        /**
+         * The Column.
+         */
         int column = 0;
+        /**
+         * The Row.
+         */
         int row = 0;
 
         @Override
@@ -140,6 +230,11 @@ public final class Level implements Iterable<GameObject>, Serializable {
             return retObj;
         }
 
+        /**
+         * Gets current position.
+         *
+         * @return the current position
+         */
         public Point getCurrentPosition() {
             return new Point(column, row);
         }
