@@ -4,15 +4,15 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HighestScore implements Serializable {
+public class HighScore implements Serializable {
     private static File file = GameFile.getFile("./src/main/resources/level/score.dat");
-    private static Map<Integer, Integer> highestScoreMap = new HashMap<>();
+    private static Map<Integer, Integer> highScoreMap = new HashMap<>();
 
     public static void loadMap() {
         if (file.exists()) {
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file)))
             {
-                highestScoreMap = (HashMap) in.readObject();
+                highScoreMap = (HashMap) in.readObject();
             }
             catch (IOException e)
             {
@@ -28,7 +28,7 @@ public class HighestScore implements Serializable {
     public static void saveMap() {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file)))
         {
-            out.writeObject(highestScoreMap);
+            out.writeObject(highScoreMap);
             out.flush();
             out.close();
         }
@@ -39,25 +39,25 @@ public class HighestScore implements Serializable {
     }
 
     public static void updateMap(int levelIndex, int move) {
-        if (highestScoreMap.containsKey(levelIndex)) {
-            int leastMove = highestScoreMap.get(levelIndex);
+        if (highScoreMap.containsKey(levelIndex)) {
+            int leastMove = highScoreMap.get(levelIndex);
             if (move < leastMove) {
-                highestScoreMap.put(levelIndex, move);
+                highScoreMap.put(levelIndex, move);
             }
         } else {
-            highestScoreMap.put(levelIndex, move);
+            highScoreMap.put(levelIndex, move);
         }
     }
 
-    public static int getHighestScore(int levelIndex) {
-        if (highestScoreMap.containsKey(levelIndex)) {
-            return highestScoreMap.get(levelIndex);
+    public static int getHighScore(int levelIndex) {
+        if (highScoreMap.containsKey(levelIndex)) {
+            return highScoreMap.get(levelIndex);
         } else {
             return 0;
         }
     }
 
-    public static Map getHighestScoreList() {
-        return highestScoreMap;
+    public static Map getHighScoreList() {
+        return highScoreMap;
     }
 }

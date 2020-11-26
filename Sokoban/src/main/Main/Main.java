@@ -2,7 +2,8 @@ package Main;
 
 import Controller.GameEngine;
 import Debug.GameLogger;
-import Modal.HighestScore;
+import Modal.HighScore;
+import Modal.History;
 import View.GameWindow;
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -26,7 +27,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         loadDefaultSaveFile();
-        HighestScore.loadMap();
+        HighScore.loadMap();
 
         GameWindow.createGameWindow(primaryStage);
         GameLogger.createLogger();
@@ -34,7 +35,7 @@ public class Main extends Application {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
-                HighestScore.saveMap();
+                HighScore.saveMap();
             }
         });
     }

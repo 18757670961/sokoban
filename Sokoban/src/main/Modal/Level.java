@@ -1,10 +1,9 @@
 package Modal;
 
-import Controller.GameEngine;
 import Debug.GameLogger;
 
 import java.awt.*;
-import java.io.Serializable;
+import java.io.*;
 import java.util.Iterator;
 import java.util.List;
 
@@ -98,6 +97,15 @@ public final class Level implements Iterable<GameObject>, Serializable {
                 curTile = null;
             }
         }
+    }
+
+    public Level deepClone() throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(this);
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+        return (Level) objectInputStream.readObject();
     }
 
     /**

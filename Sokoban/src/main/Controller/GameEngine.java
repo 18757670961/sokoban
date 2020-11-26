@@ -1,14 +1,12 @@
 package Controller;
 
-import Modal.GameGrid;
-import Modal.GameObject;
-import Modal.HighestScore;
-import Modal.Level;
+import Modal.*;
 import Debug.GameLogger;
 import View.GameWindow;
 import javafx.scene.input.KeyCode;
 
 import java.awt.*;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -40,6 +38,7 @@ public final class GameEngine implements Serializable {
      * The Moves count.
      */
     private int movesCount = 0;
+    private int movesCountLevel = 0;
     /**
      * The Current level.
      */
@@ -51,7 +50,7 @@ public final class GameEngine implements Serializable {
     /**
      * The Serializable levels.
      */
-    private Level[] serializableLevels = {};
+    private Level[] serializableLevels = null;
     /**
      * The Game complete.
      */
@@ -124,20 +123,43 @@ public final class GameEngine implements Serializable {
     public void handleKey(KeyCode code) {
         // switch replaced with enhanced switch
         switch (code) {
-            case UP -> getPositionInfo(new Point(-1, 0));
+            case W:
+            case UP:
+                getPositionInfo(new Point(-1, 0));
+                break;
 
-            case RIGHT -> getPositionInfo(new Point(0, 1));
+            case D:
+            case RIGHT:
+                getPositionInfo(new Point(0, 1));
+                break;
 
-            case DOWN -> getPositionInfo(new Point(1, 0));
+            case S:
+            case DOWN:
+                getPositionInfo(new Point(1, 0));
+                break;
 
-            case LEFT -> getPositionInfo(new Point(0, -1));
+            case A:
+            case LEFT:
+                getPositionInfo(new Point(0, -1));
+                break;
 
-            case F1 -> getPositionInfo(new Point(0, -1)); // save game
+            case F1:
+                GameWindow.saveGame(); // save game
+                break;
 
-            case F2 -> getPositionInfo(new Point(0, -1)); // load game
+            case F2:
+                GameWindow.loadGame(); // load game
+                break;
 
-            default -> {
-            }
+            case Q:
+                History.traceHistory(); // undo
+                break;
+
+            case R:
+                History.resetHistory(); // reset
+                break;
+
+            default:
             // TODO: implement something funny.
         }
 
@@ -169,9 +191,14 @@ public final class GameEngine implements Serializable {
 
         // method extracted
         try {
+            History.getHistory().push(currentLevel.deepClone());
             move(positionInfo);
         } catch (AssertionError e) {
             System.out.println(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
@@ -242,15 +269,17 @@ public final class GameEngine implements Serializable {
 
         positionInfo.getKeeperPosition().translate((int) positionInfo.getDelta().getX(), (int) positionInfo.getDelta().getY());
         movesCount++;
+        movesCountLevel++;
 
         if (currentLevel.isComplete()) {
-            HighestScore.updateMap(currentLevel.getIndex(), movesCount);
-            GameWindow.showHighestScore();
+            HighScore.updateMap(currentLevel.getIndex(), movesCountLevel);
+            GameWindow.showHighScore();
 
             if (GameLogger.isDebugActive()) {
                 System.out.println("Level complete!");
             }
 
+            movesCountLevel = 0;
             currentLevel = getNextLevel();
         }
     }
@@ -273,6 +302,8 @@ public final class GameEngine implements Serializable {
      * @return the next level
      */
     private Level getNextLevel() {
+        History.getHistory().clear();
+
         if (currentLevel == null) {
             return levels.get(0);
         }
@@ -320,6 +351,10 @@ public final class GameEngine implements Serializable {
      */
     public int getMovesCount() {
         return movesCount;
+    }
+
+    public int getMovesCountLevel() {
+        return movesCountLevel;
     }
 
     /**

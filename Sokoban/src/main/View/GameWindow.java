@@ -2,10 +2,7 @@ package View;
 
 import Controller.GameEngine;
 import Debug.GameLogger;
-import Modal.GameFile;
-import Modal.GameObject;
-import Modal.HighestScore;
-import Modal.Level;
+import Modal.*;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -151,6 +148,7 @@ public class GameWindow {
      */
     private static void reloadGrid() {
         if (GameEngine.getGameEngine().isGameComplete()) {
+            HighScore.updateMap(0, GameEngine.getGameEngine().getMovesCount());
             showVictoryMessage();
             return;
         }
@@ -165,17 +163,6 @@ public class GameWindow {
 
         gameGrid.autosize();
         primaryStage.sizeToScene();
-    }
-
-    /**
-     * Show victory message.
-     */
-    private static void showVictoryMessage() {
-        String dialogTitle = "Game Over!";
-        String dialogMessage = "You completed " + GameEngine.getGameEngine().getMapSetName() + " in " + GameEngine.getGameEngine().getMovesCount() + " moves!";
-        MotionBlur motionBlur = new MotionBlur(2, 3); // vairable name changed
-
-        GameDialog dialog = new GameDialog(primaryStage, dialogTitle, dialogMessage, motionBlur);
     }
 
     /**
@@ -228,15 +215,28 @@ public class GameWindow {
      * Undo.
      */
     private static void undo() {
-        closeGame();
+        History.traceHistory();
+        reloadGrid();
     }
 
     /**
      * Reset level.
      */
     private static void resetLevel() {
-        //gameEngine.setCurrentLevel(gameEngine.getSerializableLevels()[gameEngine.getCurrentLevel().getIndex()]);
+        History.resetHistory();
         reloadGrid();
+    }
+
+    /**
+     * Show victory message.
+     */
+    private static void showVictoryMessage() {
+        String dialogTitle = "Game Over !";
+        String dialogMessage = "You completed " + GameEngine.getGameEngine().getMapSetName() + " in " + GameEngine.getGameEngine().getMovesCount() + " moves!\n" +
+                "High score in history: " + HighScore.getHighScore(0) + " moves";
+        MotionBlur motionBlur = new MotionBlur(2, 3); // vairable name changed
+
+        GameDialog dialog = new GameDialog(primaryStage, dialogTitle, dialogMessage, motionBlur);
     }
 
     /**
@@ -248,11 +248,11 @@ public class GameWindow {
         GameDialog dialog = new GameDialog(primaryStage, title, message, null);
     }
 
-    public static void showHighestScore() {
+    public static void showHighScore() {
         String title = "Good Job !";
         String message = "Level completed: " + GameEngine.getGameEngine().getCurrentLevel().getName() +
-                "\n\n" + "Highest score: " + HighestScore.getHighestScore(GameEngine.getGameEngine().getCurrentLevel().getIndex()) + " moves\n\n"
-                + "Your score: " + GameEngine.getGameEngine().getMovesCount() + " moves";
+                "\n\n" + "High score: " + HighScore.getHighScore(GameEngine.getGameEngine().getCurrentLevel().getIndex()) + " moves\n\n"
+                + "Your score: " + GameEngine.getGameEngine().getMovesCountLevel() + " moves";
         GameDialog dialog = new GameDialog(primaryStage, title, message, null);
     }
 
