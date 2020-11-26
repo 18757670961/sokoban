@@ -31,13 +31,6 @@ public class Main extends Application {
 
         GameWindow.createGameWindow(primaryStage);
         GameLogger.createLogger();
-
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                HighScore.saveMap();
-            }
-        });
     }
 
     /**

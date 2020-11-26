@@ -1,7 +1,8 @@
-package Modal;
+package Controller;
 
 import Debug.GameLogger;
 import Controller.GameEngine;
+import Modal.Level;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -36,8 +37,10 @@ public final class GameFile {
         fileChooser = new FileChooser();
         fileChooser.setTitle(title);
         if (type == 0) {
+            // save game
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.dat"));
         } else {
+            // load game
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.skb", "*.dat"));
         }
         fileChooser.setInitialDirectory(getFile("./src/main/resources/level"));

@@ -1,19 +1,21 @@
 package View;
 
 import Controller.GameEngine;
+import Controller.GameFile;
 import Debug.GameLogger;
 import Modal.*;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
-import javafx.scene.effect.MotionBlur;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.awt.*;
 import java.io.FileInputStream;
@@ -77,7 +79,7 @@ public class GameWindow {
      */
     private static Menu createMenuAbout() {
         MenuItem menuItemAbout = new MenuItem("About This Game");
-        menuItemAbout.setOnAction(actionEvent -> showAbout());
+        menuItemAbout.setOnAction(actionEvent -> GameDialog.showAbout());
         Menu menuAbout = new Menu("About");
         menuAbout.getItems().addAll(menuItemAbout);
         return menuAbout;
@@ -97,9 +99,13 @@ public class GameWindow {
         radioMenuItemDebug.setOnAction(actionEvent -> toggleDebug());
         MenuItem menuItemResetLevel = new MenuItem("Reset Level");
         menuItemResetLevel.setOnAction(actionEvent -> resetLevel());
+        MenuItem menuItemPreviousLevel = new MenuItem("Previous Level");
+        menuItemPreviousLevel.setOnAction(actionEvent -> GameEngine.getGameEngine().toPreviousLevel());
+        MenuItem menuItemNextLevel = new MenuItem("Next Level");
+        menuItemNextLevel.setOnAction(actionEvent -> GameEngine.getGameEngine().toNextLevel());
         Menu menuLevel = new Menu("Level");
         menuLevel.getItems().addAll(menuItemUndo, radioMenuItemMusic, radioMenuItemDebug,
-                new SeparatorMenuItem(), menuItemResetLevel);
+                new SeparatorMenuItem(), menuItemPreviousLevel, menuItemNextLevel, menuItemResetLevel);
         return menuLevel;
     }
 
@@ -141,6 +147,12 @@ public class GameWindow {
             GameEngine.getGameEngine().handleKey(event.getCode());
             reloadGrid();
         });
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                HighScore.saveMap();
+            }
+        });
     }
 
     /**
@@ -149,7 +161,7 @@ public class GameWindow {
     private static void reloadGrid() {
         if (GameEngine.getGameEngine().isGameComplete()) {
             HighScore.updateMap(0, GameEngine.getGameEngine().getMovesCount());
-            showVictoryMessage();
+            GameDialog.showVictoryMessage();
             return;
         }
 
@@ -228,35 +240,6 @@ public class GameWindow {
     }
 
     /**
-     * Show victory message.
-     */
-    private static void showVictoryMessage() {
-        String dialogTitle = "Game Over !";
-        String dialogMessage = "You completed " + GameEngine.getGameEngine().getMapSetName() + " in " + GameEngine.getGameEngine().getMovesCount() + " moves!\n" +
-                "High score in history: " + HighScore.getHighScore(0) + " moves";
-        MotionBlur motionBlur = new MotionBlur(2, 3); // vairable name changed
-
-        GameDialog dialog = new GameDialog(primaryStage, dialogTitle, dialogMessage, motionBlur);
-    }
-
-    /**
-     * Show about.
-     */
-    private static void showAbout() {
-        String title = "About this game";
-        String message = "Game created by Shuguang LYU (Desmond)\n";
-        GameDialog dialog = new GameDialog(primaryStage, title, message, null);
-    }
-
-    public static void showHighScore() {
-        String title = "Good Job !";
-        String message = "Level completed: " + GameEngine.getGameEngine().getCurrentLevel().getName() +
-                "\n\n" + "High score: " + HighScore.getHighScore(GameEngine.getGameEngine().getCurrentLevel().getIndex()) + " moves\n\n"
-                + "Your score: " + GameEngine.getGameEngine().getMovesCountLevel() + " moves";
-        GameDialog dialog = new GameDialog(primaryStage, title, message, null);
-    }
-
-    /**
      * Toggle music.
      */
     private static void toggleMusic() {
@@ -273,5 +256,9 @@ public class GameWindow {
     private static void toggleDebug() {
         GameLogger.toggleDebug();
         reloadGrid();
+    }
+
+    public static Stage getPrimaryStage() {
+        return primaryStage;
     }
 }

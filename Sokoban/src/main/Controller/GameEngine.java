@@ -2,6 +2,7 @@ package Controller;
 
 import Modal.*;
 import Debug.GameLogger;
+import View.GameDialog;
 import View.GameWindow;
 import javafx.scene.input.KeyCode;
 
@@ -65,17 +66,12 @@ public final class GameEngine implements Serializable {
     private GameEngine() {}
 
     /**
-     * Parse file.
+     * Create game engine.
      *
-     * @param input the input
+     * @param engine the engine
      */
-    private void parseFile(InputStream input) {
-        try {
-            levels = FileParser.prepareFileReader(input);
-            currentLevel = getNextLevel();
-        } catch (NoSuchElementException e) {
-            GameLogger.showWarning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
-        }
+    public static void createGameEngine(GameEngine engine) {
+        gameEngine = engine;
     }
 
     /**
@@ -89,12 +85,17 @@ public final class GameEngine implements Serializable {
     }
 
     /**
-     * Create game engine.
+     * Parse file.
      *
-     * @param engine the engine
+     * @param input the input
      */
-    public static void createGameEngine(GameEngine engine) {
-        gameEngine = engine;
+    private void parseFile(InputStream input) {
+        try {
+            levels = FileParser.prepareFileReader(input);
+            currentLevel = getNextLevel();
+        } catch (NoSuchElementException e) {
+            GameLogger.showWarning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
+        }
     }
 
     /**
@@ -155,8 +156,16 @@ public final class GameEngine implements Serializable {
                 History.traceHistory(); // undo
                 break;
 
-            case R:
+            case E:
                 History.resetHistory(); // reset
+                break;
+
+            case Z:
+                toPreviousLevel();
+                break;
+
+            case X:
+                toNextLevel();
                 break;
 
             default:
@@ -165,6 +174,23 @@ public final class GameEngine implements Serializable {
 
         if (GameLogger.isDebugActive()) {
             System.out.println(code);
+        }
+    }
+
+    public void toNextLevel() {
+        movesCount = 0;
+        if (currentLevel.getIndex() < levels.size())
+            currentLevel = getNextLevel();
+    }
+
+    public void toPreviousLevel() {
+        movesCount = 0;
+        movesCountLevel = 0;
+        History.getHistory().clear();
+
+        int currentLevelIndex = currentLevel.getIndex();
+        if (currentLevelIndex > 1) {
+            currentLevel = levels.get(currentLevelIndex - 2);
         }
     }
 
@@ -258,6 +284,19 @@ public final class GameEngine implements Serializable {
     }
 
     /**
+     * Move object.
+     *
+     * @param delta          the delta
+     * @param keeperPosition the keeper position
+     * @param keeper         the keeper
+     */
+    private void moveObject(Point delta, Point keeperPosition, GameObject keeper) {
+        GameGrid objectsGrid = currentLevel.objectsGrid;
+        objectsGrid.putGameObjectAt(objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
+        objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
+    }
+
+    /**
      * Check keeper position.
      *
      * @param positionInfo the position info
@@ -273,27 +312,14 @@ public final class GameEngine implements Serializable {
 
         if (currentLevel.isComplete()) {
             HighScore.updateMap(currentLevel.getIndex(), movesCountLevel);
-            GameWindow.showHighScore();
+            GameDialog.showHighScore();
 
             if (GameLogger.isDebugActive()) {
                 System.out.println("Level complete!");
             }
 
-            movesCountLevel = 0;
             currentLevel = getNextLevel();
         }
-    }
-
-    /**
-     * Move object.
-     *
-     * @param delta          the delta
-     * @param keeperPosition the keeper position
-     * @param keeper         the keeper
-     */
-    private void moveObject(Point delta, Point keeperPosition, GameObject keeper) {
-        currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
-        currentLevel.objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
     }
 
     /**
@@ -302,6 +328,7 @@ public final class GameEngine implements Serializable {
      * @return the next level
      */
     private Level getNextLevel() {
+        movesCountLevel = 0;
         History.getHistory().clear();
 
         if (currentLevel == null) {

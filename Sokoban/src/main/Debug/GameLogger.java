@@ -1,7 +1,7 @@
 package Debug;
 
 import Controller.GameEngine;
-import Modal.GameFile;
+import Controller.GameFile;
 
 import java.io.File;
 import java.io.IOException;

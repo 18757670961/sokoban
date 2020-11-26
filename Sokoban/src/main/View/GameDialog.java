@@ -1,8 +1,11 @@
 package View;
 
+import Controller.GameEngine;
+import Modal.HighScore;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.effect.Effect;
+import javafx.scene.effect.MotionBlur;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -44,6 +47,35 @@ public class GameDialog {
         dialog = setDialogTitle(primaryStage, dialogTitle);
         Text text1 = setDialogMessage(dialogMessage, dialogMessageEffect);
         setDialogScene(text1);
+    }
+
+    /**
+     * Show victory message.
+     */
+    static void showVictoryMessage() {
+        String dialogTitle = "Game Over !";
+        String dialogMessage = "You completed " + GameEngine.getGameEngine().getMapSetName() + " in " + GameEngine.getGameEngine().getMovesCount() + " moves!\n" +
+                "High score in history: " + HighScore.getHighScore(0) + " moves";
+        MotionBlur motionBlur = new MotionBlur(2, 3); // vairable name changed
+
+        GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), dialogTitle, dialogMessage, motionBlur);
+    }
+
+    /**
+     * Show about.
+     */
+    static void showAbout() {
+        String title = "About this game";
+        String message = "Game created by Shuguang LYU (Desmond)\n";
+        GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), title, message, null);
+    }
+
+    public static void showHighScore() {
+        String title = "Good Job !";
+        String message = "Level completed: " + GameEngine.getGameEngine().getCurrentLevel().getName() +
+                "\n\n" + "High score: " + HighScore.getHighScore(GameEngine.getGameEngine().getCurrentLevel().getIndex()) + " moves\n\n"
+                + "Your score: " + GameEngine.getGameEngine().getMovesCountLevel() + " moves";
+        GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), title, message, null);
     }
 
     /**
