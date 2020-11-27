@@ -1,7 +1,6 @@
 package View;
 
 import Controller.GameEngine;
-import Modal.GameObject;
 import Debug.GameLogger;
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
@@ -19,14 +18,14 @@ public class GraphicObject extends Rectangle {
      *
      * @param obj the obj
      */
-    public GraphicObject(GameObject obj) {
+    public GraphicObject(char obj) {
         Paint color = setColor(obj);
 
         this.setFill(color);
         this.setHeight(30);
         this.setWidth(30);
 
-        if (obj != GameObject.WALL) {
+        if (obj != 'W') {
             this.setArcHeight(50);
             this.setArcWidth(50);
         }
@@ -43,22 +42,22 @@ public class GraphicObject extends Rectangle {
      * @param obj the obj
      * @return the color
      */
-    private Paint setColor(GameObject obj) {
+    private Paint setColor(char obj) {
         Paint color;
 
         // switch replaced with enhanced switch
         switch (obj) {
-            case WALL -> color = Color.BLACK;
-            case CRATE -> color = Color.ORANGE;
-            case DIAMOND -> {
+            case 'W' -> color = Color.BLACK;
+            case 'C' -> color = Color.ORANGE;
+            case 'D' -> {
                 color = Color.DEEPSKYBLUE;
                 if (GameLogger.isDebugActive()) {
                     setTransition();
                 }
             }
-            case KEEPER -> color = Color.RED;
-            case FLOOR -> color = Color.WHITE;
-            case CRATE_ON_DIAMOND -> color = Color.DARKCYAN;
+            case 'S' -> color = Color.RED;
+            case ' ' -> color = Color.WHITE;
+            case 'O' -> color = Color.DARKCYAN;
             default -> {
                 String message = "Error in Level constructor. Object not recognized.";
                 GameLogger.showSevere(message);

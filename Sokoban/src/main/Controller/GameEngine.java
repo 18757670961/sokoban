@@ -205,10 +205,10 @@ public final class GameEngine implements Serializable {
         }
 
         Point keeperPosition = currentLevel.getKeeperPosition();
-        GameObject keeper = currentLevel.objectsGrid.getGameObjectAt(keeperPosition);
+        char keeper = currentLevel.objectsGrid.getGameObjectAt(keeperPosition);
         boolean keeperMoved = false;
         Point targetObjectPoint = GameGrid.translatePoint(keeperPosition, delta);
-        GameObject keeperTarget = currentLevel.objectsGrid.getGameObjectAt(targetObjectPoint);
+        char keeperTarget = currentLevel.objectsGrid.getGameObjectAt(targetObjectPoint);
         PositionInfo positionInfo = new PositionInfo(delta, keeperPosition, keeper, keeperMoved, targetObjectPoint, keeperTarget);
 
         if (GameLogger.isDebugActive()) {
@@ -253,12 +253,12 @@ public final class GameEngine implements Serializable {
         // switch replaced with enhanced switch
         switch (positionInfo.getKeeperTarget()) {
 
-            case WALL -> {
+            case 'W' -> {
             }
 
-            case CRATE -> {
-                GameObject crateTarget = currentLevel.getTargetObject(positionInfo.getTargetObjectPoint(), positionInfo.getDelta());
-                if (crateTarget != GameObject.FLOOR) {
+            case 'C' -> {
+                char crateTarget = currentLevel.getTargetObject(positionInfo.getTargetObjectPoint(), positionInfo.getDelta());
+                if (crateTarget != ' ') {
                     break;
                 }
 
@@ -267,7 +267,7 @@ public final class GameEngine implements Serializable {
                 positionInfo.setKeeperMoved(true);
             }
 
-            case FLOOR -> {
+            case ' ' -> {
                 moveObject(positionInfo.getDelta(), positionInfo.getKeeperPosition(), positionInfo.getKeeper());
                 positionInfo.setKeeperMoved(true);
                 break;
@@ -290,7 +290,7 @@ public final class GameEngine implements Serializable {
      * @param keeperPosition the keeper position
      * @param keeper         the keeper
      */
-    private void moveObject(Point delta, Point keeperPosition, GameObject keeper) {
+    private void moveObject(Point delta, Point keeperPosition, char keeper) {
         GameGrid objectsGrid = currentLevel.objectsGrid;
         objectsGrid.putGameObjectAt(objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
         objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));

@@ -54,14 +54,14 @@ public enum GameObject {
      * @return the game object
      */
 // method name changed
-    public static GameObject toGameObject(char character) {
-        for (GameObject gameObject : GameObject.values()) {
-            if (Character.toUpperCase(character) == gameObject.symbol) {
-                return gameObject;
-            }
-        }
-        return WALL;
-    }
+//    public static GameObject toGameObject(char character) {
+//        for (GameObject gameObject : GameObject.values()) {
+//            if (char.toUpperCase(character) == gameObject.symbol) {
+//                return gameObject;
+//            }
+//        }
+//        return WALL;
+//    }
 
     /**
      * Gets string symbol.

@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * The type Level.
  */
-public final class Level implements Iterable<GameObject>, Serializable {
+public final class Level implements Iterable<Character>, Serializable {
     /**
      * The Objects grid.
      */
@@ -83,18 +83,17 @@ public final class Level implements Iterable<GameObject>, Serializable {
     private void parseRawLevel(List<String> rawLevel) {
         for (int row = 0; row < rawLevel.size(); row++) {
             for (int col = 0; col < rawLevel.get(row).length(); col++) {
-                GameObject curTile = GameObject.toGameObject(rawLevel.get(row).charAt(col));
+                char curTile = rawLevel.get(row).charAt(col);
 
-                if (curTile == GameObject.DIAMOND) {
+                if (curTile == 'D') {
                     numberOfDiamonds++;
                     diamondsGrid.putGameObjectAt(curTile, row, col);
-                    curTile = GameObject.FLOOR;
-                } else if (curTile == GameObject.KEEPER) {
+                    curTile = ' ';
+                } else if (curTile == 'S') {
                     keeperPosition = new Point(row, col);
                 }
 
                 objectsGrid.putGameObjectAt(curTile, row, col);
-                curTile = null;
             }
         }
     }
@@ -118,7 +117,7 @@ public final class Level implements Iterable<GameObject>, Serializable {
         for (int row = 0; row < objectsGrid.ROWS; row++) {
             for (int col = 0; col < objectsGrid.COLUMNS; col++) {
                 // if condition simplified
-                if (getObject(row, col) == GameObject.CRATE && getDiamond(row, col) == GameObject.DIAMOND) {
+                if (getObject(row, col) == 'C' && getDiamond(row, col) == 'D') {
                     cratedDiamondsCount++;
                 }
             }
@@ -133,7 +132,7 @@ public final class Level implements Iterable<GameObject>, Serializable {
      * @param col the col
      * @return the diamond
      */
-    private GameObject getDiamond(int row, int col) {
+    private char getDiamond(int row, int col) {
         return diamondsGrid.getGameObjectAt(col, row);
     }
 
@@ -144,7 +143,7 @@ public final class Level implements Iterable<GameObject>, Serializable {
      * @param col the col
      * @return the object
      */
-    private GameObject getObject(int row, int col) {
+    private char getObject(int row, int col) {
         return objectsGrid.getGameObjectAt(col, row);
     }
 
@@ -182,7 +181,7 @@ public final class Level implements Iterable<GameObject>, Serializable {
      * @param delta  the delta
      * @return the target object
      */
-    public GameObject getTargetObject(Point source, Point delta) {
+    public char getTargetObject(Point source, Point delta) {
         return objectsGrid.getTargetFromSource(source, delta);
     }
 
@@ -192,14 +191,14 @@ public final class Level implements Iterable<GameObject>, Serializable {
     }
 
     @Override
-    public Iterator<GameObject> iterator() {
+    public Iterator<Character> iterator() {
         return new LevelIterator();
     }
 
     /**
      * The type Level iterator.
      */
-    public class LevelIterator implements Iterator<GameObject> {
+    public class LevelIterator implements Iterator<Character> {
 
         /**
          * The Column.
@@ -216,23 +215,24 @@ public final class Level implements Iterable<GameObject>, Serializable {
         }
 
         @Override
-        public GameObject next() {
+        public Character next() {
             if (column >= objectsGrid.COLUMNS) {
                 column = 0;
                 row++;
             }
-            GameObject object = getObject(row, column);
-            GameObject diamond = getDiamond(row, column);
-            GameObject retObj = object;
+            char object = getObject(row, column);
+            char diamond = getDiamond(row, column);
+            char retObj = object;
             column++;
+
             // if structure improved
-            if (diamond != GameObject.DIAMOND) {
+            if (diamond != 'D') {
                 return retObj;
             }
-            if (object == GameObject.CRATE) {
-                retObj = GameObject.CRATE_ON_DIAMOND;
+            if (object == 'C') {
+                retObj = 'O';
             }
-            if (object == GameObject.FLOOR) {
+            if (object == ' ') {
                 retObj = diamond;
             }
             return retObj;

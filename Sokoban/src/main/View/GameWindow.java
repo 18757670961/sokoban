@@ -183,7 +183,7 @@ public class GameWindow {
      * @param gameObject the game object
      * @param location   the location
      */
-    private static void addObjectToGrid(GameObject gameObject, Point location) {
+    private static void addObjectToGrid(char gameObject, Point location) {
         GraphicObject graphicObject = new GraphicObject(gameObject);
         gameGrid.add(graphicObject, location.y, location.x);
     }
