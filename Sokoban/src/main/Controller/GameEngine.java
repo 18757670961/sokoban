@@ -116,67 +116,6 @@ public final class GameEngine implements Serializable {
         return gameComplete;
     }
 
-    /**
-     * Handle key.
-     *
-     * @param code the code
-     */
-    public void handleKey(KeyCode code) {
-        // switch replaced with enhanced switch
-        switch (code) {
-            case W:
-            case UP:
-                getPositionInfo(new Point(-1, 0));
-                break;
-
-            case D:
-            case RIGHT:
-                getPositionInfo(new Point(0, 1));
-                break;
-
-            case S:
-            case DOWN:
-                getPositionInfo(new Point(1, 0));
-                break;
-
-            case A:
-            case LEFT:
-                getPositionInfo(new Point(0, -1));
-                break;
-
-            case F1:
-                GameWindow.saveGame(); // save game
-                break;
-
-            case F2:
-                GameWindow.loadGame(); // load game
-                break;
-
-            case Q:
-                History.traceHistory(); // undo
-                break;
-
-            case E:
-                History.resetHistory(); // reset
-                break;
-
-            case Z:
-                toPreviousLevel();
-                break;
-
-            case X:
-                toNextLevel();
-                break;
-
-            default:
-            // TODO: implement something funny.
-        }
-
-        if (GameLogger.isDebugActive()) {
-            System.out.println(code);
-        }
-    }
-
     public void toNextLevel() {
         movesCount = 0;
         if (currentLevel.getIndex() < levels.size())
@@ -186,6 +125,7 @@ public final class GameEngine implements Serializable {
     public void toPreviousLevel() {
         movesCount = 0;
         movesCountLevel = 0;
+        History.resetHistory();
         History.getHistory().clear();
 
         int currentLevelIndex = currentLevel.getIndex();
@@ -194,14 +134,33 @@ public final class GameEngine implements Serializable {
         }
     }
 
+    public void handleMovement(Point delta) {
+        PositionInfo positionInfo = getPositionInfo(delta);
+        if (positionInfo == null) {
+            return;
+        }
+
+        // method extracted
+        try {
+            History.getHistory().push(currentLevel.deepClone());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        move(positionInfo);
+        checkGameStatus(positionInfo);
+    }
+
     /**
      * Move.
      *
      * @param delta the delta
      */
-    private void getPositionInfo(Point delta) {
+    private PositionInfo getPositionInfo(Point delta) {
         if (isGameComplete()) {
-            return;
+            return null;
         }
 
         Point keeperPosition = currentLevel.getKeeperPosition();
@@ -212,34 +171,10 @@ public final class GameEngine implements Serializable {
         PositionInfo positionInfo = new PositionInfo(delta, keeperPosition, keeper, keeperMoved, targetObjectPoint, keeperTarget);
 
         if (GameLogger.isDebugActive()) {
-            printState(positionInfo);
+            GameLogger.printState(positionInfo);
         }
 
-        // method extracted
-        try {
-            History.getHistory().push(currentLevel.deepClone());
-            move(positionInfo);
-        } catch (AssertionError e) {
-            System.out.println(e.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Print state.
-     *
-     * @param positionInfo the position info
-     */
-// method extracted
-    private void printState(PositionInfo positionInfo) {
-        System.out.println("Current level state:");
-        System.out.println(currentLevel.toString());
-        System.out.println("Keeper pos: " + positionInfo.getKeeperPosition());
-        System.out.println("Movement source obj: " + positionInfo.getKeeper());
-        System.out.printf("Target object: %s at [%s]", positionInfo.getKeeperTarget(), positionInfo.getTargetObjectPoint());
+        return positionInfo;
     }
 
     /**
@@ -262,13 +197,13 @@ public final class GameEngine implements Serializable {
                     break;
                 }
 
-                moveObject(positionInfo.getDelta(), positionInfo.getTargetObjectPoint(), positionInfo.getKeeperTarget());
-                moveObject(positionInfo.getDelta(), positionInfo.getKeeperPosition(), positionInfo.getKeeper());
+                moveTargetObject(positionInfo);
+                moveKeeper(positionInfo);
                 positionInfo.setKeeperMoved(true);
             }
 
             case ' ' -> {
-                moveObject(positionInfo.getDelta(), positionInfo.getKeeperPosition(), positionInfo.getKeeper());
+                moveKeeper(positionInfo);
                 positionInfo.setKeeperMoved(true);
                 break;
             }
@@ -279,21 +214,26 @@ public final class GameEngine implements Serializable {
             }
 
         }
-
-        checkKeeperPosition(positionInfo);
     }
 
-    /**
-     * Move object.
-     *
-     * @param delta          the delta
-     * @param keeperPosition the keeper position
-     * @param keeper         the keeper
-     */
-    private void moveObject(Point delta, Point keeperPosition, char keeper) {
+    private void moveTargetObject(PositionInfo position) {
+        Point delta = position.getDelta();
+        Point targetPosition = position.getTargetObjectPoint();
+        char target = position.getKeeperTarget();
+        putObject(delta, targetPosition, target);
+    }
+
+    private void moveKeeper(PositionInfo position) {
+        Point delta = position.getDelta();
+        Point keeperPosition = position.getKeeperPosition();
+        char keeper = position.getKeeper();
+        putObject(delta, keeperPosition, keeper);
+    }
+
+    private void putObject(Point delta, Point position, char object) {
         GameGrid objectsGrid = currentLevel.objectsGrid;
-        objectsGrid.putGameObjectAt(objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
-        objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
+        objectsGrid.putGameObjectAt(objectsGrid.getGameObjectAt(GameGrid.translatePoint(position, delta)), position);
+        objectsGrid.putGameObjectAt(object, GameGrid.translatePoint(position, delta));
     }
 
     /**
@@ -301,7 +241,7 @@ public final class GameEngine implements Serializable {
      *
      * @param positionInfo the position info
      */
-    private void checkKeeperPosition(PositionInfo positionInfo) {
+    private void checkGameStatus(PositionInfo positionInfo) {
         // if structure improved
         if (!positionInfo.isKeeperMoved())
             return;
@@ -329,6 +269,7 @@ public final class GameEngine implements Serializable {
      */
     private Level getNextLevel() {
         movesCountLevel = 0;
+        History.resetHistory();
         History.getHistory().clear();
 
         if (currentLevel == null) {

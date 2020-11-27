@@ -2,18 +2,23 @@ package View;
 
 import Controller.GameEngine;
 import Controller.GameFile;
+import Controller.KeyHandler;
 import Debug.GameLogger;
 import Modal.*;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -56,6 +61,13 @@ public class GameWindow {
         primaryStage = ps;
         createMenu();
         createPane();
+
+        primaryStage.setTitle(GameEngine.getGameEngine().getGameName());
+        primaryStage.setScene(new Scene(root));
+        //primaryStage.initModality(Modality.APPLICATION_MODAL);
+        primaryStage.getIcons().add(new Image("file:src/main/resources/image/box.png"));
+        primaryStage.show();
+
         setEventFilter();
         reloadGrid();
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
@@ -134,9 +146,6 @@ public class GameWindow {
         root = new GridPane();
         root.add(menu, 0, 0);
         root.add(gameGrid, 0, 1);
-        primaryStage.setTitle(GameEngine.getGameEngine().getGameName());
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
     }
 
     /**
@@ -144,8 +153,7 @@ public class GameWindow {
      */
     public static void setEventFilter() {
         primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            GameEngine.getGameEngine().handleKey(event.getCode());
-            reloadGrid();
+            KeyHandler.handleKey(event.getCode());
         });
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -158,23 +166,74 @@ public class GameWindow {
     /**
      * Reload grid.
      */
-    private static void reloadGrid() {
+    public static void reloadPartialGrid() {
         if (GameEngine.getGameEngine().isGameComplete()) {
-            HighScore.updateMap(0, GameEngine.getGameEngine().getMovesCount());
-            GameDialog.showVictoryMessage();
+            doBeforeExit();
             return;
         }
 
         Level currentLevel = GameEngine.getGameEngine().getCurrentLevel();
-        Level.LevelIterator levelGridIterator = (Level.LevelIterator) currentLevel.iterator();
-        gameGrid.getChildren().clear();
+        Level.LevelIterator newLevelGridIterator = (Level.LevelIterator) currentLevel.iterator();
+        Level previousLevel = History.getHistory().peek();
+        Level.LevelIterator oldLevelGridIterator = (Level.LevelIterator) previousLevel.iterator();
+        addPartialObjects(newLevelGridIterator, oldLevelGridIterator);
 
-        while (levelGridIterator.hasNext()) {
-            addObjectToGrid(levelGridIterator.next(), levelGridIterator.getCurrentPosition());
+        gameGrid.autosize();
+        primaryStage.sizeToScene();
+    }
+
+    public static void reloadPartialGrid(Level level) {
+        if (GameEngine.getGameEngine().isGameComplete()) {
+            doBeforeExit();
+            return;
+        }
+
+        Level currentLevel = GameEngine.getGameEngine().getCurrentLevel();
+        Level.LevelIterator newLevelGridIterator = (Level.LevelIterator) currentLevel.iterator();
+        Level previousLevel = level;
+        Level.LevelIterator oldLevelGridIterator = (Level.LevelIterator) previousLevel.iterator();
+        addPartialObjects(newLevelGridIterator, oldLevelGridIterator);
+
+        gameGrid.autosize();
+        primaryStage.sizeToScene();
+    }
+
+    private static void addPartialObjects(Level.LevelIterator newLevelGridIterator, Level.LevelIterator oldLevelGridIterator) {
+        while (newLevelGridIterator.hasNext()) {
+            char oldObject = oldLevelGridIterator.next();
+            char newObject = newLevelGridIterator.next();
+            Point newObjectPosition = newLevelGridIterator.getCurrentPosition();
+            if (oldObject != newObject) {
+                addObjectToGrid(newObject, newObjectPosition);
+            }
+        }
+    }
+
+    /**
+     * Reload grid.
+     */
+    public static void reloadGrid() {
+        if (GameEngine.getGameEngine().isGameComplete()) {
+            doBeforeExit();
+            return;
+        }
+
+        Level currentLevel = GameEngine.getGameEngine().getCurrentLevel();
+        Level.LevelIterator newLevelGridIterator = (Level.LevelIterator) currentLevel.iterator();
+        gameGrid.getChildren().clear();
+        while (newLevelGridIterator.hasNext()) {
+            char newObject = newLevelGridIterator.next();
+            Point newObjectPosition = newLevelGridIterator.getCurrentPosition();
+            addObjectToGrid(newObject, newObjectPosition);
         }
 
         gameGrid.autosize();
         primaryStage.sizeToScene();
+    }
+
+    private static void doBeforeExit() {
+        HighScore.updateMap(0, GameEngine.getGameEngine().getMovesCount());
+        GameDialog.showVictoryMessage();
     }
 
     /**
@@ -184,8 +243,42 @@ public class GameWindow {
      * @param location   the location
      */
     private static void addObjectToGrid(char gameObject, Point location) {
-        GraphicObject graphicObject = new GraphicObject(gameObject);
-        gameGrid.add(graphicObject, location.y, location.x);
+//        GraphicObject graphicObject = new GraphicObject(gameObject);
+//        gameGrid.add(graphicObject, location.y, location.x);
+        ImageView img = setImage(gameObject);
+        gameGrid.add(img, location.y, location.x);
+    }
+
+    private static ImageView setImage(char obj) {
+        String file;
+
+        switch (obj) {
+            case 'W':
+                file = "file:src/main/resources/image/wall.bmp";
+                break;
+            case ' ':
+                file = "file:src/main/resources/image/floor.bmp";
+                break;
+            case 'C':
+                file = "file:src/main/resources/image/box.png";
+                break;
+            case 'D':
+                file = "file:src/main/resources/image/goal.png";
+                break;
+            case 'S':
+                file = "file:src/main/resources/image/playerD.png";
+                break;
+            case 'O':
+                file = "file:src/main/resources/image/boxP.png";
+                break;
+            default:
+                String message = "Error in Level constructor. Object not recognized.";
+                GameLogger.showSevere(message);
+                throw new AssertionError(message);
+        }
+
+        ImageView img = new ImageView(new Image(file));
+        return img;
     }
 
     /**
@@ -216,6 +309,7 @@ public class GameWindow {
                 } else {
                     GameEngine.createGameEngine((FileInputStream) fileInput);
                 }
+                History.getHistory().clear();
                 reloadGrid();
             }
         } catch (FileNotFoundException e) {
@@ -227,16 +321,14 @@ public class GameWindow {
      * Undo.
      */
     private static void undo() {
-        History.traceHistory();
-        reloadGrid();
+        reloadPartialGrid(History.traceHistory());
     }
 
     /**
      * Reset level.
      */
     private static void resetLevel() {
-        History.resetHistory();
-        reloadGrid();
+        reloadPartialGrid(History.resetHistory());
     }
 
     /**

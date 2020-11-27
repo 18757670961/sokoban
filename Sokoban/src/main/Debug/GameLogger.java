@@ -2,6 +2,7 @@ package Debug;
 
 import Controller.GameEngine;
 import Controller.GameFile;
+import Controller.PositionInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -117,5 +118,19 @@ public final class GameLogger extends Logger {
      */
     public static void toggleDebug() {
         debug = !debug;
+    }
+
+    /**
+     * Print state.
+     *
+     * @param positionInfo the position info
+     */
+// method extracted
+    public static void printState(PositionInfo positionInfo) {
+        System.out.println("Current level state:");
+        System.out.println(GameEngine.getGameEngine().getCurrentLevel().toString());
+        System.out.println("Keeper pos: " + positionInfo.getKeeperPosition());
+        System.out.println("Movement source obj: " + positionInfo.getKeeper());
+        System.out.printf("Target object: %s at [%s]", positionInfo.getKeeperTarget(), positionInfo.getTargetObjectPoint());
     }
 }
