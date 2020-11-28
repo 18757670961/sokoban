@@ -2,6 +2,7 @@ package Controller;
 
 import Debug.GameLogger;
 import Controller.GameEngine;
+import Modal.GameStatus;
 import Modal.Level;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -62,7 +63,7 @@ public final class GameFile {
 
             try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file)))
             {
-                // serialize gameEngine
+                // serialize gameStatus
                 serialize(out);
             }
             catch (IOException e)
@@ -79,11 +80,11 @@ public final class GameFile {
      * @throws IOException the io exception
      */
     private static void serialize(ObjectOutputStream out) throws IOException {
-        List<Level> levelList = GameEngine.getGameEngine().getLevels();
+        List<Level> levelList = GameStatus.getGameStatus().getLevels();
         Level[] levelArray = new Level[levelList.size()];
         levelList.toArray(levelArray);
-        GameEngine.getGameEngine().setSerializableLevels(levelArray); // level list -> level array
-        out.writeObject(GameEngine.getGameEngine());
+        GameStatus.getGameStatus().setSerializableLevels(levelArray); // level list -> level array
+        out.writeObject(GameStatus.getGameStatus());
         out.flush();
         out.close();
     }
@@ -108,7 +109,7 @@ public final class GameFile {
             if (fileExtension.equals(".dat")) {
                 try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file)))
                 {
-                    // deserialize gameEngine
+                    // deserialize gameStatus
                     return deserialize(in);
                 }
                 catch (IOException e)
@@ -135,11 +136,11 @@ public final class GameFile {
      * @throws IOException            the io exception
      * @throws ClassNotFoundException the class not found exception
      */
-    private static GameEngine deserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        GameEngine gameEngine = (GameEngine) in.readObject();
-        gameEngine.setLevels(Arrays.asList(gameEngine.getSerializableLevels())); // level array -> level list
-        gameEngine.setSerializableLevels(null); // clean up level array
+    private static GameStatus deserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        GameStatus gameStatus = (GameStatus) in.readObject();
+        gameStatus.setLevels(Arrays.asList(gameStatus.getSerializableLevels())); // level array -> level list
+        gameStatus.setSerializableLevels(null); // clean up level array
         in.close();
-        return gameEngine;
+        return gameStatus;
     }
 }

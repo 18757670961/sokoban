@@ -1,6 +1,7 @@
 package Controller;
 
 import Debug.GameLogger;
+import Modal.GameStatus;
 import Modal.History;
 import View.GameWindow;
 import javafx.scene.input.KeyCode;
@@ -9,30 +10,29 @@ import java.awt.*;
 
 public final class KeyHandler {
     public static void handleKey(KeyCode code) {
-        GameEngine gameEngine = GameEngine.getGameEngine();
         // switch replaced with enhanced switch
         switch (code) {
             case W:
             case UP:
-                gameEngine.handleMovement(new Point(-1, 0));
+                GameEngine.handleMovement(new Point(-1, 0));
                 GameWindow.reloadPartialGrid();
                 break;
 
             case D:
             case RIGHT:
-                gameEngine.handleMovement(new Point(0, 1));
+                GameEngine.handleMovement(new Point(0, 1));
                 GameWindow.reloadPartialGrid();
                 break;
 
             case S:
             case DOWN:
-                gameEngine.handleMovement(new Point(1, 0));
+                GameEngine.handleMovement(new Point(1, 0));
                 GameWindow.reloadPartialGrid();
                 break;
 
             case A:
             case LEFT:
-                gameEngine.handleMovement(new Point(0, -1));
+                GameEngine.handleMovement(new Point(0, -1));
                 GameWindow.reloadPartialGrid();
                 break;
 
@@ -53,12 +53,12 @@ public final class KeyHandler {
                 break;
 
             case Z:
-                gameEngine.toPreviousLevel();
+                GameEngine.toPreviousLevel();
                 GameWindow.reloadGrid();
                 break;
 
             case X:
-                gameEngine.toNextLevel();
+                GameEngine.toNextLevel();
                 GameWindow.reloadGrid();
                 break;
 

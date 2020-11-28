@@ -4,9 +4,12 @@ import Controller.GameEngine;
 import Controller.GameFile;
 import Controller.KeyHandler;
 import Debug.GameLogger;
-import Modal.*;
+import Modal.GameStatus;
+import Modal.HighScore;
+import Modal.History;
+import Modal.Level;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -15,10 +18,10 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -62,7 +65,7 @@ public class GameWindow {
         createMenu();
         createPane();
 
-        primaryStage.setTitle(GameEngine.getGameEngine().getGameName());
+        primaryStage.setTitle(GameStatus.getGameStatus().getGameName());
         primaryStage.setScene(new Scene(root));
         //primaryStage.initModality(Modality.APPLICATION_MODAL);
         primaryStage.getIcons().add(new Image("file:src/main/resources/image/box.png"));
@@ -112,9 +115,9 @@ public class GameWindow {
         MenuItem menuItemResetLevel = new MenuItem("Reset Level");
         menuItemResetLevel.setOnAction(actionEvent -> resetLevel());
         MenuItem menuItemPreviousLevel = new MenuItem("Previous Level");
-        menuItemPreviousLevel.setOnAction(actionEvent -> GameEngine.getGameEngine().toPreviousLevel());
+        menuItemPreviousLevel.setOnAction(actionEvent -> GameEngine.toPreviousLevel());
         MenuItem menuItemNextLevel = new MenuItem("Next Level");
-        menuItemNextLevel.setOnAction(actionEvent -> GameEngine.getGameEngine().toNextLevel());
+        menuItemNextLevel.setOnAction(actionEvent -> GameEngine.toNextLevel());
         Menu menuLevel = new Menu("Level");
         menuLevel.getItems().addAll(menuItemUndo, radioMenuItemMusic, radioMenuItemDebug,
                 new SeparatorMenuItem(), menuItemPreviousLevel, menuItemNextLevel, menuItemResetLevel);
@@ -167,12 +170,12 @@ public class GameWindow {
      * Reload grid.
      */
     public static void reloadPartialGrid() {
-        if (GameEngine.getGameEngine().isGameComplete()) {
+        if (GameStatus.getGameStatus().isGameComplete()) {
             doBeforeExit();
             return;
         }
 
-        Level currentLevel = GameEngine.getGameEngine().getCurrentLevel();
+        Level currentLevel = GameStatus.getGameStatus().getCurrentLevel();
         Level.LevelIterator newLevelGridIterator = (Level.LevelIterator) currentLevel.iterator();
         Level previousLevel = History.getHistory().peek();
         Level.LevelIterator oldLevelGridIterator = (Level.LevelIterator) previousLevel.iterator();
@@ -183,12 +186,12 @@ public class GameWindow {
     }
 
     public static void reloadPartialGrid(Level level) {
-        if (GameEngine.getGameEngine().isGameComplete()) {
+        if (GameStatus.getGameStatus().isGameComplete()) {
             doBeforeExit();
             return;
         }
 
-        Level currentLevel = GameEngine.getGameEngine().getCurrentLevel();
+        Level currentLevel = GameStatus.getGameStatus().getCurrentLevel();
         Level.LevelIterator newLevelGridIterator = (Level.LevelIterator) currentLevel.iterator();
         Level previousLevel = level;
         Level.LevelIterator oldLevelGridIterator = (Level.LevelIterator) previousLevel.iterator();
@@ -213,12 +216,12 @@ public class GameWindow {
      * Reload grid.
      */
     public static void reloadGrid() {
-        if (GameEngine.getGameEngine().isGameComplete()) {
+        if (GameStatus.getGameStatus().isGameComplete()) {
             doBeforeExit();
             return;
         }
 
-        Level currentLevel = GameEngine.getGameEngine().getCurrentLevel();
+        Level currentLevel = GameStatus.getGameStatus().getCurrentLevel();
         Level.LevelIterator newLevelGridIterator = (Level.LevelIterator) currentLevel.iterator();
         gameGrid.getChildren().clear();
         while (newLevelGridIterator.hasNext()) {
@@ -232,7 +235,7 @@ public class GameWindow {
     }
 
     private static void doBeforeExit() {
-        HighScore.updateMap(0, GameEngine.getGameEngine().getMovesCount());
+        HighScore.updateMap(0, GameStatus.getGameStatus().getMovesCount());
         GameDialog.showVictoryMessage();
     }
 
@@ -304,10 +307,10 @@ public class GameWindow {
             fileInput = GameFile.loadGameFile(primaryStage);
 
             if (fileInput != null) {
-                if (fileInput instanceof GameEngine) {
-                    GameEngine.createGameEngine((GameEngine) fileInput);
+                if (fileInput instanceof GameStatus) {
+                    GameStatus.createGameStatus((GameStatus) fileInput);
                 } else {
-                    GameEngine.createGameEngine((FileInputStream) fileInput);
+                    GameStatus.createGameStatus((FileInputStream) fileInput);
                 }
                 History.getHistory().clear();
                 reloadGrid();

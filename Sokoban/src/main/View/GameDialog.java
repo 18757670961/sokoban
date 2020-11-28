@@ -1,6 +1,7 @@
 package View;
 
 import Controller.GameEngine;
+import Modal.GameStatus;
 import Modal.HighScore;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -54,7 +55,7 @@ public class GameDialog {
      */
     static void showVictoryMessage() {
         String dialogTitle = "Game Over !";
-        String dialogMessage = "You completed " + GameEngine.getGameEngine().getMapSetName() + " in " + GameEngine.getGameEngine().getMovesCount() + " moves!\n" +
+        String dialogMessage = "You completed " + GameStatus.getGameStatus().getMapSetName() + " in " + GameStatus.getGameStatus().getMovesCount() + " moves!\n" +
                 "High score in history: " + HighScore.getHighScore(0) + " moves";
         MotionBlur motionBlur = new MotionBlur(2, 3); // vairable name changed
 
@@ -72,9 +73,9 @@ public class GameDialog {
 
     public static void showHighScore() {
         String title = "Good Job !";
-        String message = "Level completed: " + GameEngine.getGameEngine().getCurrentLevel().getName() +
-                "\n\n" + "High score: " + HighScore.getHighScore(GameEngine.getGameEngine().getCurrentLevel().getIndex()) + " moves\n\n"
-                + "Your score: " + GameEngine.getGameEngine().getMovesCountLevel() + " moves";
+        String message = "Level completed: " + GameStatus.getGameStatus().getCurrentLevel().getName() +
+                "\n\n" + "High score: " + HighScore.getHighScore(GameStatus.getGameStatus().getCurrentLevel().getIndex()) + " moves\n\n"
+                + "Your score: " + GameStatus.getGameStatus().getMovesCountLevel() + " moves";
         GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), title, message, null);
     }
 

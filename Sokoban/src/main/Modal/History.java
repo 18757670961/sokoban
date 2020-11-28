@@ -32,10 +32,10 @@ public final class History {
      * Trace history.
      */
     public static Level traceHistory() {
-        Level currentLevel = GameEngine.getGameEngine().getCurrentLevel();
+        Level currentLevel = GameStatus.getGameStatus().getCurrentLevel();
         if (!historyList.isEmpty()) {
             Level previousLevel = historyList.pop();
-            GameEngine.getGameEngine().setCurrentLevel(previousLevel);
+            GameStatus.getGameStatus().setCurrentLevel(previousLevel);
         }
         return currentLevel;
     }
@@ -44,12 +44,12 @@ public final class History {
      * Reset history.
      */
     public static Level resetHistory() {
-        Level currentLevel = GameEngine.getGameEngine().getCurrentLevel();
+        Level currentLevel = GameStatus.getGameStatus().getCurrentLevel();
         if (!historyList.isEmpty()) {
             Level initialLevel = historyList.get(0);
-            int currentIndex = GameEngine.getGameEngine().getCurrentLevel().getIndex();
-            GameEngine.getGameEngine().getLevels().set(currentIndex - 1, initialLevel);
-            GameEngine.getGameEngine().setCurrentLevel(initialLevel);
+            int currentIndex = currentLevel.getIndex();
+            GameStatus.getGameStatus().getLevels().set(currentIndex - 1, initialLevel);
+            GameStatus.getGameStatus().setCurrentLevel(initialLevel);
             historyList.clear();
         }
         return currentLevel;

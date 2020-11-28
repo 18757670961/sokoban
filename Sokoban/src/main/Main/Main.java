@@ -2,6 +2,7 @@ package Main;
 
 import Controller.GameEngine;
 import Debug.GameLogger;
+import Modal.GameStatus;
 import Modal.HighScore;
 import Modal.History;
 import View.GameWindow;
@@ -49,6 +50,6 @@ public class Main extends Application {
      */
     private void loadDefaultSaveFile() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(defaultSaveFile); // variable name changed
-        GameEngine.createGameEngine(inputStream);
+        GameStatus.createGameStatus(inputStream);
     }
 }
