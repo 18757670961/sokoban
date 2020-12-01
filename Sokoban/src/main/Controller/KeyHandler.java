@@ -7,33 +7,34 @@ import View.GameWindow;
 import javafx.scene.input.KeyCode;
 
 import java.awt.*;
+import java.io.IOException;
 
 public final class KeyHandler {
-    public static void handleKey(KeyCode code) {
+    public static void handleKey(KeyCode code) throws IOException {
         // switch replaced with enhanced switch
         switch (code) {
             case W:
             case UP:
                 GameEngine.handleMovement(new Point(-1, 0));
-                GameWindow.reloadPartialGrid();
+                reload();
                 break;
 
             case D:
             case RIGHT:
                 GameEngine.handleMovement(new Point(0, 1));
-                GameWindow.reloadPartialGrid();
+                reload();
                 break;
 
             case S:
             case DOWN:
                 GameEngine.handleMovement(new Point(1, 0));
-                GameWindow.reloadPartialGrid();
+                reload();
                 break;
 
             case A:
             case LEFT:
                 GameEngine.handleMovement(new Point(0, -1));
-                GameWindow.reloadPartialGrid();
+                reload();
                 break;
 
             case F1:
@@ -68,6 +69,14 @@ public final class KeyHandler {
 
         if (GameLogger.isDebugActive()) {
             System.out.println(code);
+        }
+    }
+
+    private static void reload() throws IOException {
+        if (GameStatus.getGameStatus().getMovesCountLevel() == 0) {
+            GameWindow.reloadGrid();
+        } else {
+            GameWindow.reloadPartialGrid();
         }
     }
 }

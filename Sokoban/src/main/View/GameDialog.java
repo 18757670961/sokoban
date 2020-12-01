@@ -3,6 +3,7 @@ package View;
 import Controller.GameEngine;
 import Modal.GameStatus;
 import Modal.HighScore;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.effect.Effect;
@@ -13,6 +14,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  * The type Game dialog.
@@ -60,6 +62,7 @@ public class GameDialog {
         MotionBlur motionBlur = new MotionBlur(2, 3); // vairable name changed
 
         GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), dialogTitle, dialogMessage, motionBlur);
+//        dialog.setCloseEvent();
     }
 
     /**
@@ -129,4 +132,13 @@ public class GameDialog {
         dialog.setTitle(dialogTitle);
         return dialog;
     }
+
+//    private void setCloseEvent() {
+//        dialog.setOnCloseRequest(new EventHandler<WindowEvent>() {
+//            @Override
+//            public void handle(WindowEvent event) {
+//                javafx.application.Platform.exit();
+//            }
+//        });
+//    }
 }

@@ -20,7 +20,7 @@ public final class GameStatus implements Serializable {
     private List<Level> levels = null;
     private Level[] serializableLevels = null;
     private boolean gameComplete = false;
-
+    
     private GameStatus() {}
 
     public static void createGameStatus(GameStatus status) {

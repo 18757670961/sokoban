@@ -21,6 +21,7 @@ public final class GameFile {
      * The constant fileChooser.
      */
     private static FileChooser fileChooser;
+    private static String defaultSaveFile = "./src/main/resources/level/sampleGame.skb";
 
     /**
      * Load file file.
@@ -29,6 +30,16 @@ public final class GameFile {
      * @return the file
      */
     public static File getFile(String uri) { return new File(uri); }
+
+    /**
+     * Load default save file.
+     *
+     * @param primaryStage the primary stage
+     */
+    public static void loadDefaultSaveFile() throws FileNotFoundException {
+        FileInputStream inputStream = new FileInputStream(getFile(defaultSaveFile));
+        GameStatus.createGameStatus(inputStream);
+    }
 
     /**
      * Create file chooser.

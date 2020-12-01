@@ -4,12 +4,14 @@ import Controller.GameEngine;
 import Controller.GameFile;
 import Controller.KeyHandler;
 import Debug.GameLogger;
+import Main.Main;
 import Modal.GameStatus;
 import Modal.HighScore;
 import Modal.History;
 import Modal.Level;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -28,6 +30,10 @@ import javafx.stage.WindowEvent;
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * The type Game window.
@@ -55,24 +61,37 @@ public class GameWindow {
      */
     private static MediaPlayer mediaPlayer = new MediaPlayer(new Media(GameFile.getFile("src/main/resources/music/bgm.wav").toURI().toString()));
 
+    public static void createStartMenu() throws IOException {
+        Parent parent = FXMLLoader.load(new URL("file:src/main/View/Menu.fxml"));
+        Scene scene = new Scene(parent);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Sokoban");
+//        primaryStage.initModality(Modality.APPLICATION_MODAL);
+        primaryStage.setResizable(false);
+        primaryStage.getIcons().add(new Image("file:src/main/resources/image/box.png"));
+        primaryStage.show();
+        primaryStage.setOnCloseRequest(event -> System.exit(0));
+    }
+
     /**
      * Instantiates a new Game window.
      *
      * @param primaryStage the primary stage
      */
-    public static void createGameWindow(Stage ps) {
-        primaryStage = ps;
+    public static void createGameWindow() throws IOException {
         createMenu();
         createPane();
 
         primaryStage.setTitle(GameStatus.getGameStatus().getGameName());
         primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false);
+//        primaryStage.setFullScreen(true);
+//        primaryStage.setWidth(1920);
+//        primaryStage.setHeight(1080);
+//        primaryStage.centerOnScreen();
         //primaryStage.initModality(Modality.APPLICATION_MODAL);
         primaryStage.getIcons().add(new Image("file:src/main/resources/image/box.png"));
-        primaryStage.show();
-
         setEventFilter();
-        reloadGrid();
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
     }
 
@@ -107,13 +126,31 @@ public class GameWindow {
      */
     private static Menu createMenuLevel() {
         MenuItem menuItemUndo = new MenuItem("Undo");
-        menuItemUndo.setOnAction(actionEvent -> undo());
+        menuItemUndo.setOnAction(actionEvent -> {
+            try {
+                undo();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         RadioMenuItem radioMenuItemMusic = new RadioMenuItem("Toggle Music");
         radioMenuItemMusic.setOnAction(actionEvent -> toggleMusic());
         RadioMenuItem radioMenuItemDebug = new RadioMenuItem("Toggle Debug");
-        radioMenuItemDebug.setOnAction(actionEvent -> toggleDebug());
+        radioMenuItemDebug.setOnAction(actionEvent -> {
+            try {
+                toggleDebug();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         MenuItem menuItemResetLevel = new MenuItem("Reset Level");
-        menuItemResetLevel.setOnAction(actionEvent -> resetLevel());
+        menuItemResetLevel.setOnAction(actionEvent -> {
+            try {
+                resetLevel();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         MenuItem menuItemPreviousLevel = new MenuItem("Previous Level");
         menuItemPreviousLevel.setOnAction(actionEvent -> GameEngine.toPreviousLevel());
         MenuItem menuItemNextLevel = new MenuItem("Next Level");
@@ -156,20 +193,24 @@ public class GameWindow {
      */
     public static void setEventFilter() {
         primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            KeyHandler.handleKey(event.getCode());
-        });
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                HighScore.saveMap();
+            try {
+                KeyHandler.handleKey(event.getCode());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
+//        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+//            @Override
+//            public void handle(WindowEvent event) {
+//                HighScore.saveMap();
+//            }
+//        });
     }
 
     /**
      * Reload grid.
      */
-    public static void reloadPartialGrid() {
+    public static void reloadPartialGrid() throws IOException {
         if (GameStatus.getGameStatus().isGameComplete()) {
             doBeforeExit();
             return;
@@ -182,10 +223,10 @@ public class GameWindow {
         addPartialObjects(newLevelGridIterator, oldLevelGridIterator);
 
         gameGrid.autosize();
-        primaryStage.sizeToScene();
+//        primaryStage.sizeToScene();
     }
 
-    public static void reloadPartialGrid(Level level) {
+    public static void reloadPartialGrid(Level level) throws IOException {
         if (GameStatus.getGameStatus().isGameComplete()) {
             doBeforeExit();
             return;
@@ -198,7 +239,7 @@ public class GameWindow {
         addPartialObjects(newLevelGridIterator, oldLevelGridIterator);
 
         gameGrid.autosize();
-        primaryStage.sizeToScene();
+//        primaryStage.sizeToScene();
     }
 
     private static void addPartialObjects(Level.LevelIterator newLevelGridIterator, Level.LevelIterator oldLevelGridIterator) {
@@ -215,7 +256,7 @@ public class GameWindow {
     /**
      * Reload grid.
      */
-    public static void reloadGrid() {
+    public static void reloadGrid() throws IOException {
         if (GameStatus.getGameStatus().isGameComplete()) {
             doBeforeExit();
             return;
@@ -232,11 +273,15 @@ public class GameWindow {
 
         gameGrid.autosize();
         primaryStage.sizeToScene();
+        primaryStage.centerOnScreen();
     }
 
-    private static void doBeforeExit() {
+    private static void doBeforeExit() throws IOException {
         HighScore.updateMap(0, GameStatus.getGameStatus().getMovesCount());
         GameDialog.showVictoryMessage();
+        History.getHistory().clear();
+        GameFile.loadDefaultSaveFile();
+        createStartMenu();
     }
 
     /**
@@ -317,20 +362,22 @@ public class GameWindow {
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     /**
      * Undo.
      */
-    private static void undo() {
+    private static void undo() throws IOException {
         reloadPartialGrid(History.traceHistory());
     }
 
     /**
      * Reset level.
      */
-    private static void resetLevel() {
+    private static void resetLevel() throws IOException {
         reloadPartialGrid(History.resetHistory());
     }
 
@@ -348,12 +395,16 @@ public class GameWindow {
     /**
      * Toggle debug.
      */
-    private static void toggleDebug() {
+    private static void toggleDebug() throws IOException {
         GameLogger.toggleDebug();
         reloadGrid();
     }
 
     public static Stage getPrimaryStage() {
         return primaryStage;
+    }
+
+    public static void setPrimaryStage(Stage stage) {
+        primaryStage = stage;
     }
 }
