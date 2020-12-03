@@ -1,6 +1,8 @@
-package Controller;
+package Utils;
 
-import Debug.GameLogger;
+import Controller.GameEngine;
+import Utils.GameLogger;
+import Modal.GameStatus;
 import Modal.Level;
 
 import java.io.BufferedReader;
@@ -8,9 +10,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class FileParser {
+    /**
+     * Parse file.
+     *
+     * @param input the input
+     */
+    public static void parseFile(InputStream input) {
+        try {
+            GameStatus.getGameStatus().setLevels(prepareFileReader(input));
+            GameStatus.getGameStatus().setCurrentLevel(GameEngine.getNextLevel());
+        } catch (NoSuchElementException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Load game file list.
      *
@@ -55,7 +73,7 @@ public class FileParser {
             }
 
             if (line.contains("MapSetName")) {
-                GameEngine.getGameEngine().setMapSetName(line.replace("MapSetName: ", ""));
+                GameStatus.getGameStatus().setMapSetName(line.replace("MapSetName: ", ""));
                 continue;
             }
 

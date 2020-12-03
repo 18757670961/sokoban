@@ -1,14 +1,22 @@
 package View;
 
 import Controller.GameEngine;
-import Debug.GameLogger;
-import Modal.*;
+import Controller.KeyHandler;
+import Modal.GameStatus;
+import Modal.History;
+import Modal.Level;
+import Utils.GameFile;
+import Utils.GameLogger;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
-import javafx.scene.effect.MotionBlur;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
@@ -16,14 +24,16 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
 import java.awt.*;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * The type Game window.
  */
 // GUI class extracted
-public class GameWindow {
+public class GameWindow implements Observer {
     /**
      * The Primary stage.
      */
@@ -45,17 +55,39 @@ public class GameWindow {
      */
     private static MediaPlayer mediaPlayer = new MediaPlayer(new Media(GameFile.getFile("src/main/resources/music/bgm.wav").toURI().toString()));
 
+    public static void createStartMenu() throws IOException {
+        Parent parent = FXMLLoader.load(new URL("file:src/main/View/MenuWindow.fxml"));
+        Scene scene = new Scene(parent);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Sokoban");
+//        primaryStage.initModality(Modality.APPLICATION_MODAL);
+        primaryStage.setResizable(false);
+        primaryStage.getIcons().add(new Image("file:src/main/resources/image/box.png"));
+        primaryStage.show();
+        primaryStage.setOnCloseRequest(event -> System.exit(0));
+    }
+
     /**
      * Instantiates a new Game window.
      *
      * @param primaryStage the primary stage
      */
-    public static void createGameWindow(Stage ps) {
-        primaryStage = ps;
+    public static void createGameWindow() throws IOException {
+//        GameStatus.addObserver(this);
+
         createMenu();
         createPane();
-        setEventFilter();
-        reloadGrid();
+
+        primaryStage.setTitle(GameStatus.getGameStatus().getGameName());
+        primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false);
+//        primaryStage.setFullScreen(true);
+//        primaryStage.setWidth(1920);
+//        primaryStage.setHeight(1080);
+//        primaryStage.centerOnScreen();
+        //primaryStage.initModality(Modality.APPLICATION_MODAL);
+        primaryStage.getIcons().add(new Image("file:src/main/resources/image/box.png"));
+        setEventHandler();
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
     }
 
@@ -77,7 +109,7 @@ public class GameWindow {
      */
     private static Menu createMenuAbout() {
         MenuItem menuItemAbout = new MenuItem("About This Game");
-        menuItemAbout.setOnAction(actionEvent -> showAbout());
+        menuItemAbout.setOnAction(actionEvent -> GameDialog.showAbout());
         Menu menuAbout = new Menu("About");
         menuAbout.getItems().addAll(menuItemAbout);
         return menuAbout;
@@ -90,16 +122,20 @@ public class GameWindow {
      */
     private static Menu createMenuLevel() {
         MenuItem menuItemUndo = new MenuItem("Undo");
-        menuItemUndo.setOnAction(actionEvent -> undo());
+        menuItemUndo.setOnAction(actionEvent -> reloadPartialGrid(History.traceHistory()));
         RadioMenuItem radioMenuItemMusic = new RadioMenuItem("Toggle Music");
         radioMenuItemMusic.setOnAction(actionEvent -> toggleMusic());
         RadioMenuItem radioMenuItemDebug = new RadioMenuItem("Toggle Debug");
-        radioMenuItemDebug.setOnAction(actionEvent -> toggleDebug());
+        radioMenuItemDebug.setOnAction(actionEvent -> GameLogger.toggleDebug());
         MenuItem menuItemResetLevel = new MenuItem("Reset Level");
-        menuItemResetLevel.setOnAction(actionEvent -> resetLevel());
+        menuItemResetLevel.setOnAction(actionEvent -> reloadPartialGrid(History.resetHistory()));
+        MenuItem menuItemPreviousLevel = new MenuItem("Previous Level");
+        menuItemPreviousLevel.setOnAction(actionEvent -> GameEngine.toPreviousLevel());
+        MenuItem menuItemNextLevel = new MenuItem("Next Level");
+        menuItemNextLevel.setOnAction(actionEvent -> GameEngine.toNextLevel());
         Menu menuLevel = new Menu("Level");
         menuLevel.getItems().addAll(menuItemUndo, radioMenuItemMusic, radioMenuItemDebug,
-                new SeparatorMenuItem(), menuItemResetLevel);
+                new SeparatorMenuItem(), menuItemPreviousLevel, menuItemNextLevel, menuItemResetLevel);
         return menuLevel;
     }
 
@@ -110,11 +146,11 @@ public class GameWindow {
      */
     private static Menu createMenuFile() {
         MenuItem menuItemSaveGame = new MenuItem("Save Game");
-        menuItemSaveGame.setOnAction(actionEvent -> saveGame());
+        menuItemSaveGame.setOnAction(actionEvent -> GameFile.saveGameFile(primaryStage));
         MenuItem menuItemLoadGame = new MenuItem("Load Game");
-        menuItemLoadGame.setOnAction(actionEvent -> loadGame());
+        menuItemLoadGame.setOnAction(actionEvent -> GameEngine.loadGame(primaryStage));
         MenuItem menuItemExit = new MenuItem("Exit");
-        menuItemExit.setOnAction(actionEvent -> closeGame());
+        menuItemExit.setOnAction(actionEvent -> System.exit(0));
         Menu menuFile = new Menu("File");
         menuFile.getItems().addAll(menuItemSaveGame, menuItemLoadGame, new SeparatorMenuItem(), menuItemExit);
         return menuFile;
@@ -128,41 +164,78 @@ public class GameWindow {
         root = new GridPane();
         root.add(menu, 0, 0);
         root.add(gameGrid, 0, 1);
-        primaryStage.setTitle(GameEngine.getGameEngine().getGameName());
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
     }
 
     /**
      * Sets event filter.
      */
-    public static void setEventFilter() {
+    public static void setEventHandler() {
         primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            GameEngine.getGameEngine().handleKey(event.getCode());
-            reloadGrid();
+            try {
+                KeyHandler.handleKey(event.getCode());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
+//        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+//            @Override
+//            public void handle(WindowEvent event) {
+//                HighScore.saveMap();
+//            }
+//        });
+    }
+
+    private static void resizeWindow() {
+        gameGrid.autosize();
+        primaryStage.sizeToScene();
+    }
+
+    public static void reloadPartialGrid(Level level) {
+        if (GameStatus.getGameStatus().isGameComplete()) {
+            GameEngine.navigateToStart();
+            return;
+        }
+
+        Level currentLevel = GameStatus.getGameStatus().getCurrentLevel();
+        Level.LevelIterator newLevelGridIterator = (Level.LevelIterator) currentLevel.iterator();
+        Level previousLevel = (level == null ? History.getHistory().peek() : level);
+        Level.LevelIterator oldLevelGridIterator = (Level.LevelIterator) previousLevel.iterator();
+        addPartialObjects(newLevelGridIterator, oldLevelGridIterator);
+
+        resizeWindow();
+    }
+
+    private static void addPartialObjects(Level.LevelIterator newLevelGridIterator, Level.LevelIterator oldLevelGridIterator) {
+        while (newLevelGridIterator.hasNext()) {
+            char oldObject = oldLevelGridIterator.next();
+            char newObject = newLevelGridIterator.next();
+            Point newObjectPosition = newLevelGridIterator.getCurrentPosition();
+            if (oldObject != newObject) {
+                addObjectToGrid(newObject, newObjectPosition);
+            }
+        }
     }
 
     /**
      * Reload grid.
      */
-    private static void reloadGrid() {
-        if (GameEngine.getGameEngine().isGameComplete()) {
-            HighScore.updateMap(0, GameEngine.getGameEngine().getMovesCount());
-            showVictoryMessage();
+    public static void reloadGrid() {
+        if (GameStatus.getGameStatus().isGameComplete()) {
+            GameEngine.navigateToStart();
             return;
         }
 
-        Level currentLevel = GameEngine.getGameEngine().getCurrentLevel();
-        Level.LevelIterator levelGridIterator = (Level.LevelIterator) currentLevel.iterator();
+        Level currentLevel = GameStatus.getGameStatus().getCurrentLevel();
+        Level.LevelIterator newLevelGridIterator = (Level.LevelIterator) currentLevel.iterator();
         gameGrid.getChildren().clear();
-
-        while (levelGridIterator.hasNext()) {
-            addObjectToGrid(levelGridIterator.next(), levelGridIterator.getCurrentPosition());
+        while (newLevelGridIterator.hasNext()) {
+            char newObject = newLevelGridIterator.next();
+            Point newObjectPosition = newLevelGridIterator.getCurrentPosition();
+            addObjectToGrid(newObject, newObjectPosition);
         }
 
-        gameGrid.autosize();
-        primaryStage.sizeToScene();
+        resizeWindow();
+        primaryStage.centerOnScreen();
     }
 
     /**
@@ -171,89 +244,55 @@ public class GameWindow {
      * @param gameObject the game object
      * @param location   the location
      */
-    private static void addObjectToGrid(GameObject gameObject, Point location) {
-        GraphicObject graphicObject = new GraphicObject(gameObject);
-        gameGrid.add(graphicObject, location.y, location.x);
-    }
-
-    /**
-     * Close game.
-     */
-    private static void closeGame() {
-        System.exit(0);
-    }
-
-    /**
-     * Save game.
-     */
-    public static void saveGame() {
-        GameFile.saveGameFile(primaryStage);
-    }
-
-    /**
-     * Load game.
-     */
-    public static void loadGame() {
-        try {
-            Object fileInput;
-            fileInput = GameFile.loadGameFile(primaryStage);
-
-            if (fileInput != null) {
-                if (fileInput instanceof GameEngine) {
-                    GameEngine.createGameEngine((GameEngine) fileInput);
-                } else {
-                    GameEngine.createGameEngine((FileInputStream) fileInput);
-                }
-                reloadGrid();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+    private static void addObjectToGrid(char gameObject, Point location) {
+//        GraphicObject graphicObject = new GraphicObject(gameObject);
+//        gameGrid.add(graphicObject, location.y, location.x);
+        ImageView img = setImage(gameObject);
+        if (img != null) {
+            gameGrid.add(img, location.y, location.x);
         }
     }
 
-    /**
-     * Undo.
-     */
-    private static void undo() {
-        History.traceHistory();
-        reloadGrid();
-    }
+    private static ImageView setImage(char obj) {
+        String file;
 
-    /**
-     * Reset level.
-     */
-    private static void resetLevel() {
-        History.resetHistory();
-        reloadGrid();
-    }
+        switch (obj) {
+            case 'W':
+                file = "file:src/main/resources/image/wall.bmp";
+                break;
+            case ' ':
+                file = "file:src/main/resources/image/floor.bmp";
+                break;
+            case 'C':
+                file = "file:src/main/resources/image/box.png";
+                break;
+            case 'G':
+                file = "file:src/main/resources/image/goal.png";
+                break;
+            case 'S':
+                file = "file:src/main/resources/image/playerD.png";
+                break;
+            case 'O':
+                file = "file:src/main/resources/image/boxP.png";
+                break;
+            case 'U':
+                file = "file:src/main/resources/image/pipeU.png";
+                break;
+            case 'D':
+                file = "file:src/main/resources/image/pipeD.png";
+                break;
+            case 'L':
+                file = "file:src/main/resources/image/pipeL.png";
+                break;
+            case 'R':
+                file = "file:src/main/resources/image/pipeR.png";
+                break;
+            default:
+                return null;
+        }
 
-    /**
-     * Show victory message.
-     */
-    private static void showVictoryMessage() {
-        String dialogTitle = "Game Over !";
-        String dialogMessage = "You completed " + GameEngine.getGameEngine().getMapSetName() + " in " + GameEngine.getGameEngine().getMovesCount() + " moves!\n" +
-                "High score in history: " + HighScore.getHighScore(0) + " moves";
-        MotionBlur motionBlur = new MotionBlur(2, 3); // vairable name changed
-
-        GameDialog dialog = new GameDialog(primaryStage, dialogTitle, dialogMessage, motionBlur);
-    }
-
-    /**
-     * Show about.
-     */
-    private static void showAbout() {
-        String title = "About this game";
-        String message = "Game created by Shuguang LYU (Desmond)\n";
-        GameDialog dialog = new GameDialog(primaryStage, title, message, null);
-    }
-
-    public static void showHighScore() {
-        String title = "Good Job !";
-        String message = "Level completed: " + GameEngine.getGameEngine().getCurrentLevel().getName() +
-                "\n\n" + "High score: " + HighScore.getHighScore(GameEngine.getGameEngine().getCurrentLevel().getIndex()) + " moves\n\n"
-                + "Your score: " + GameEngine.getGameEngine().getMovesCountLevel() + " moves";
-        GameDialog dialog = new GameDialog(primaryStage, title, message, null);
+        ImageView img = new ImageView(new Image(file));
+        return img;
     }
 
     /**
@@ -267,11 +306,19 @@ public class GameWindow {
         }
     }
 
-    /**
-     * Toggle debug.
-     */
-    private static void toggleDebug() {
-        GameLogger.toggleDebug();
-        reloadGrid();
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    public static void setPrimaryStage(Stage stage) {
+        primaryStage = stage;
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        Platform.runLater( () -> {
+//            drawMap();
+//            drawInfo();
+        });
     }
 }

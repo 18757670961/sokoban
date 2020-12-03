@@ -1,14 +1,20 @@
 package View;
 
+import Controller.GameEngine;
+import Modal.GameStatus;
+import Modal.HighScore;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.effect.Effect;
+import javafx.scene.effect.MotionBlur;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  * The type Game dialog.
@@ -44,6 +50,36 @@ public class GameDialog {
         dialog = setDialogTitle(primaryStage, dialogTitle);
         Text text1 = setDialogMessage(dialogMessage, dialogMessageEffect);
         setDialogScene(text1);
+    }
+
+    /**
+     * Show victory message.
+     */
+    public static void showVictoryMessage() {
+        String dialogTitle = "Game Over !";
+        String dialogMessage = "You completed " + GameStatus.getGameStatus().getMapSetName() + " in " + GameStatus.getGameStatus().getMovesCount() + " moves!\n" +
+                "High score in history: " + HighScore.getHighScore(0) + " moves";
+        MotionBlur motionBlur = new MotionBlur(2, 3); // vairable name changed
+
+        GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), dialogTitle, dialogMessage, motionBlur);
+//        dialog.setCloseEvent();
+    }
+
+    /**
+     * Show about.
+     */
+    static void showAbout() {
+        String title = "About this game";
+        String message = "Game created by Shuguang LYU (Desmond)\n";
+        GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), title, message, null);
+    }
+
+    public static void showHighScore() {
+        String title = "Good Job !";
+        String message = "Level completed: " + GameStatus.getGameStatus().getCurrentLevel().getName() +
+                "\n\n" + "High score: " + HighScore.getHighScore(GameStatus.getGameStatus().getCurrentLevel().getIndex()) + " moves\n\n"
+                + "Your score: " + GameStatus.getGameStatus().getMovesCountLevel() + " moves";
+        GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), title, message, null);
     }
 
     /**
@@ -96,4 +132,13 @@ public class GameDialog {
         dialog.setTitle(dialogTitle);
         return dialog;
     }
+
+//    private void setCloseEvent() {
+//        dialog.setOnCloseRequest(new EventHandler<WindowEvent>() {
+//            @Override
+//            public void handle(WindowEvent event) {
+//                javafx.application.Platform.exit();
+//            }
+//        });
+//    }
 }

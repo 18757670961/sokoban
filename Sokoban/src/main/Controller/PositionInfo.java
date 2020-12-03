@@ -1,7 +1,5 @@
 package Controller;
 
-import Modal.GameObject;
-
 import java.awt.*;
 
 /**
@@ -11,7 +9,7 @@ public class PositionInfo {
     /**
      * The Delta.
      */
-    private final Point delta;
+    private Point delta;
     /**
      * The Keeper position.
      */
@@ -19,7 +17,7 @@ public class PositionInfo {
     /**
      * The Keeper.
      */
-    private final GameObject keeper;
+    private final char keeper;
     /**
      * The Keeper moved.
      */
@@ -31,7 +29,7 @@ public class PositionInfo {
     /**
      * The Keeper target.
      */
-    private final GameObject keeperTarget;
+    private final char keeperTarget;
 
     /**
      * Instantiates a new Position info.
@@ -43,7 +41,7 @@ public class PositionInfo {
      * @param targetObjectPoint the target object point
      * @param keeperTarget      the keeper target
      */
-    PositionInfo(Point delta, Point keeperPosition, GameObject keeper, boolean keeperMoved, Point targetObjectPoint, GameObject keeperTarget) {
+    PositionInfo(Point delta, Point keeperPosition, char keeper, boolean keeperMoved, Point targetObjectPoint, char keeperTarget) {
         this.delta = delta;
         this.keeperPosition = keeperPosition;
         this.keeper = keeper;
@@ -66,7 +64,7 @@ public class PositionInfo {
      *
      * @return the keeper
      */
-    public GameObject getKeeper() {
+    public char getKeeper() {
         return keeper;
     }
 
@@ -111,7 +109,13 @@ public class PositionInfo {
      *
      * @return the keeper target
      */
-    public GameObject getKeeperTarget() {
+    public char getKeeperTarget() {
         return keeperTarget;
+    }
+
+    public void setDelta(Point oldPos, Point newPos) {
+        int x = newPos.x - oldPos.x;
+        int y = newPos.y - oldPos.y;
+        delta = new Point(x, y);
     }
 }

@@ -1,12 +1,12 @@
-package Modal;
+package Utils;
 
-import Debug.GameLogger;
-import Controller.GameEngine;
+import Utils.GameLogger;
+import Modal.GameStatus;
+import Modal.Level;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,6 +19,7 @@ public final class GameFile {
      * The constant fileChooser.
      */
     private static FileChooser fileChooser;
+    private static String defaultSaveFile = "./src/main/resources/level/sampleGame.skb";
 
     /**
      * Load file file.
@@ -29,6 +30,21 @@ public final class GameFile {
     public static File getFile(String uri) { return new File(uri); }
 
     /**
+     * Load default save file.
+     *
+     * @param primaryStage the primary stage
+     */
+    public static void loadDefaultSaveFile()  {
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(getFile(defaultSaveFile));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        GameStatus.createGameStatus(inputStream);
+    }
+
+    /**
      * Create file chooser.
      */
 // factory method
@@ -36,8 +52,10 @@ public final class GameFile {
         fileChooser = new FileChooser();
         fileChooser.setTitle(title);
         if (type == 0) {
+            // save game
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.dat"));
         } else {
+            // load game
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Sokoban save file", "*.skb", "*.dat"));
         }
         fileChooser.setInitialDirectory(getFile("./src/main/resources/level"));
@@ -59,7 +77,7 @@ public final class GameFile {
 
             try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file)))
             {
-                // serialize gameEngine
+                // serialize gameStatus
                 serialize(out);
             }
             catch (IOException e)
@@ -76,11 +94,11 @@ public final class GameFile {
      * @throws IOException the io exception
      */
     private static void serialize(ObjectOutputStream out) throws IOException {
-        List<Level> levelList = GameEngine.getGameEngine().getLevels();
+        List<Level> levelList = GameStatus.getGameStatus().getLevels();
         Level[] levelArray = new Level[levelList.size()];
         levelList.toArray(levelArray);
-        GameEngine.getGameEngine().setSerializableLevels(levelArray); // level list -> level array
-        out.writeObject(GameEngine.getGameEngine());
+        GameStatus.getGameStatus().setSerializableLevels(levelArray); // level list -> level array
+        out.writeObject(GameStatus.getGameStatus());
         out.flush();
         out.close();
     }
@@ -105,7 +123,7 @@ public final class GameFile {
             if (fileExtension.equals(".dat")) {
                 try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file)))
                 {
-                    // deserialize gameEngine
+                    // deserialize gameStatus
                     return deserialize(in);
                 }
                 catch (IOException e)
@@ -132,11 +150,11 @@ public final class GameFile {
      * @throws IOException            the io exception
      * @throws ClassNotFoundException the class not found exception
      */
-    private static GameEngine deserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        GameEngine gameEngine = (GameEngine) in.readObject();
-        gameEngine.setLevels(Arrays.asList(gameEngine.getSerializableLevels())); // level array -> level list
-        gameEngine.setSerializableLevels(null); // clean up level array
+    private static GameStatus deserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        GameStatus gameStatus = (GameStatus) in.readObject();
+        gameStatus.setLevels(Arrays.asList(gameStatus.getSerializableLevels())); // level array -> level list
+        gameStatus.setSerializableLevels(null); // clean up level array
         in.close();
-        return gameEngine;
+        return gameStatus;
     }
 }

@@ -1,7 +1,6 @@
 package Modal;
 
-import Controller.GameEngine;
-import Debug.GameLogger;
+import Utils.GameLogger;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -22,7 +21,7 @@ public class GameGrid implements Iterable, Serializable {
     /**
      * The Game objects.
      */
-    private final GameObject[][] gameObjects;
+    private final char[][] gameObjects;
 
     /**
      * Instantiates a new Game grid.
@@ -44,9 +43,9 @@ public class GameGrid implements Iterable, Serializable {
      * @return the game object [ ] [ ]
      */
 // factory method
-    private GameObject[][] createGrid() {
-        final GameObject[][] gameObjects;
-        gameObjects = new GameObject[COLUMNS][ROWS];
+    private char[][] createGrid() {
+        final char[][] gameObjects;
+        gameObjects = new char[COLUMNS][ROWS];
         return gameObjects;
     }
 
@@ -79,7 +78,7 @@ public class GameGrid implements Iterable, Serializable {
      * @param delta  the delta
      * @return the target from source
      */
-    public GameObject getTargetFromSource(Point source, Point delta) {
+    public char getTargetFromSource(Point source, Point delta) {
         return getGameObjectAt(translatePoint(source, delta));
     }
 
@@ -91,7 +90,7 @@ public class GameGrid implements Iterable, Serializable {
      * @return the game object at
      * @throws ArrayIndexOutOfBoundsException the array index out of bounds exception
      */
-    public GameObject getGameObjectAt(int col, int row) throws ArrayIndexOutOfBoundsException {
+    public char getGameObjectAt(int col, int row) throws ArrayIndexOutOfBoundsException {
         // if structure improved
         if (!isPointOutOfBounds(col, row)) {
             return gameObjects[col][row];
@@ -111,7 +110,7 @@ public class GameGrid implements Iterable, Serializable {
      * @return the game object at
      * @throws IllegalArgumentException the illegal argument exception
      */
-    public GameObject getGameObjectAt(Point point) throws IllegalArgumentException {
+    public char getGameObjectAt(Point point) throws IllegalArgumentException {
         if (point == null) {
             throw new IllegalArgumentException("Point cannot be null.");
         }
@@ -131,11 +130,10 @@ public class GameGrid implements Iterable, Serializable {
      * @param y          the y
      * @return the boolean
      */
-    public boolean putGameObjectAt(GameObject gameObject, int x, int y) {
+    public boolean putGameObjectAt(char gameObject, int x, int y) {
         if (isPointOutOfBounds(x, y)) {
             return false;
         }
-
         gameObjects[x][y] = gameObject;
         return gameObjects[x][y] == gameObject;
     }
@@ -147,7 +145,7 @@ public class GameGrid implements Iterable, Serializable {
      * @param point      the point
      * @return the boolean
      */
-    public boolean putGameObjectAt(GameObject gameObject, Point point) {
+    public boolean putGameObjectAt(char gameObject, Point point) {
         return point != null && putGameObjectAt(gameObject, (int) point.getX(), (int) point.getY());
     }
 
@@ -176,12 +174,12 @@ public class GameGrid implements Iterable, Serializable {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder(gameObjects.length); // variable name changed
 
-        for (GameObject[] gameObject : gameObjects) {
-            for (GameObject aGameObject : gameObject) {
-                if (aGameObject == null) {
-                    aGameObject = GameObject.DEBUG_OBJECT;
-                }
-                stringBuilder.append(aGameObject.getCharSymbol());
+        for (char[] gameObject : gameObjects) {
+            for (char aGameObject : gameObject) {
+//                if (aGameObject == 'x') {
+//                    aGameObject = '=';
+//                }
+                stringBuilder.append(aGameObject);
             }
 
             stringBuilder.append('\n');
@@ -191,14 +189,14 @@ public class GameGrid implements Iterable, Serializable {
     }
 
     @Override
-    public Iterator<GameObject> iterator() {
+    public Iterator<Character> iterator() {
         return new GridIterator();
     }
 
     /**
      * The type Grid iterator.
      */
-    public class GridIterator implements Iterator<GameObject> {
+    public class GridIterator implements Iterator<Character> {
         /**
          * The Row.
          */
@@ -214,7 +212,7 @@ public class GameGrid implements Iterable, Serializable {
         }
 
         @Override
-        public GameObject next() {
+        public Character next() {
             if (column >= COLUMNS) {
                 column = 0;
                 row++;

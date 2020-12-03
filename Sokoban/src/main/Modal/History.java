@@ -31,23 +31,27 @@ public final class History {
     /**
      * Trace history.
      */
-    public static void traceHistory() {
-        Level previousLevel;
+    public static Level traceHistory() {
+        Level currentLevel = GameStatus.getGameStatus().getCurrentLevel();
         if (!historyList.isEmpty()) {
-            previousLevel = historyList.pop();
-            GameEngine.getGameEngine().setCurrentLevel(previousLevel);
+            Level previousLevel = historyList.pop();
+            GameStatus.getGameStatus().setCurrentLevel(previousLevel);
         }
+        return currentLevel;
     }
 
     /**
      * Reset history.
      */
-    public static void resetHistory() {
-        Level previousLevel;
+    public static Level resetHistory() {
+        Level currentLevel = GameStatus.getGameStatus().getCurrentLevel();
         if (!historyList.isEmpty()) {
-            previousLevel = historyList.get(0);
-            GameEngine.getGameEngine().setCurrentLevel(previousLevel);
+            Level initialLevel = historyList.get(0);
+            int currentIndex = currentLevel.getIndex();
+            GameStatus.getGameStatus().getLevels().set(currentIndex - 1, initialLevel);
+            GameStatus.getGameStatus().setCurrentLevel(initialLevel);
             historyList.clear();
         }
+        return currentLevel;
     }
 }

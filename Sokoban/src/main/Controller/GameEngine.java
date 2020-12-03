@@ -1,17 +1,16 @@
 package Controller;
 
+import Utils.GameFile;
+import Utils.GameLogger;
 import Modal.*;
-import Debug.GameLogger;
+import View.GameDialog;
 import View.GameWindow;
-import javafx.scene.input.KeyCode;
+import javafx.stage.Stage;
 
 import java.awt.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  * The type Game engine.
@@ -20,152 +19,52 @@ import java.util.NoSuchElementException;
 /**
  * singleton class
  */
-public final class GameEngine implements Serializable {
-    /**
-     * The constant gameEngine.
-     */
-// transfer public fields to private
-    private static GameEngine gameEngine;
-    /**
-     * The Game name.
-     */
-    private final String GAME_NAME = "Sokoban";
-    /**
-     * The Map set name.
-     */
-    private String mapSetName = "";
-    /**
-     * The Moves count.
-     */
-    private int movesCount = 0;
-    private int movesCountLevel = 0;
-    /**
-     * The Current level.
-     */
-    private Level currentLevel = null;
-    /**
-     * The Levels.
-     */
-    private List<Level> levels = null;
-    /**
-     * The Serializable levels.
-     */
-    private Level[] serializableLevels = null;
-    /**
-     * The Game complete.
-     */
-    private boolean gameComplete = false;
+public final class GameEngine {
+    private static GameStatus getStatus() {
+        return GameStatus.getGameStatus();
+    }
 
-    /**
-     * Instantiates a new Game engine.
-     *
-     * @param input      the input
-     * @param production the production
-     */
-    private GameEngine() {}
+    private static Level getCurrentLevel() {
+        return getStatus().getCurrentLevel();
+    }
 
-    /**
-     * Parse file.
-     *
-     * @param input the input
-     */
-    private void parseFile(InputStream input) {
+    public static void toNextLevel() {
+        getStatus().setMovesCount(0);
+        if (getCurrentLevel().getIndex() < getStatus().getLevels().size()) {
+            History.resetHistory();
+            getStatus().setCurrentLevel(getNextLevel());
+        }
+    }
+
+    public static void toPreviousLevel() {
+        getStatus().setMovesCount(0);
+        getStatus().setMovesCountLevel(0);
+        History.resetHistory();
+        History.getHistory().clear();
+
+        int currentLevelIndex = getCurrentLevel().getIndex();
+        if (currentLevelIndex > 1) {
+            getStatus().setCurrentLevel(getStatus().getLevels().get(currentLevelIndex - 2));
+        }
+    }
+
+    public static void handleMovement(Point delta) {
+        PositionInfo positionInfo = getPositionInfo(delta);
+        if (positionInfo == null) {
+            return;
+        }
+
+        // method extracted
         try {
-            levels = FileParser.prepareFileReader(input);
-            currentLevel = getNextLevel();
-        } catch (NoSuchElementException e) {
-            GameLogger.showWarning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
-        }
-    }
-
-    /**
-     * Create game engine.
-     *
-     * @param input the input
-     */
-    public static void createGameEngine(InputStream input) {
-        gameEngine = new GameEngine();
-        gameEngine.parseFile(input);
-    }
-
-    /**
-     * Create game engine.
-     *
-     * @param engine the engine
-     */
-    public static void createGameEngine(GameEngine engine) {
-        gameEngine = engine;
-    }
-
-    /**
-     * Gets game engine.
-     *
-     * @return the game engine
-     */
-    public static GameEngine getGameEngine() {
-        return gameEngine;
-    }
-
-    /**
-     * Is game complete boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isGameComplete() {
-        return gameComplete;
-    }
-
-    /**
-     * Handle key.
-     *
-     * @param code the code
-     */
-    public void handleKey(KeyCode code) {
-        // switch replaced with enhanced switch
-        switch (code) {
-            case W:
-            case UP:
-                getPositionInfo(new Point(-1, 0));
-                break;
-
-            case D:
-            case RIGHT:
-                getPositionInfo(new Point(0, 1));
-                break;
-
-            case S:
-            case DOWN:
-                getPositionInfo(new Point(1, 0));
-                break;
-
-            case A:
-            case LEFT:
-                getPositionInfo(new Point(0, -1));
-                break;
-
-            case F1:
-                GameWindow.saveGame(); // save game
-                break;
-
-            case F2:
-                GameWindow.loadGame(); // load game
-                break;
-
-            case Q:
-                History.traceHistory(); // undo
-                break;
-
-            case R:
-                History.resetHistory(); // reset
-                break;
-
-            default:
-            // TODO: implement something funny.
+            History.getHistory().push(getStatus().getCurrentLevel().deepClone());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
-        if (GameLogger.isDebugActive()) {
-            System.out.println(code);
-        }
+        move(positionInfo);
+        checkGameStatus(positionInfo);
     }
 
     /**
@@ -173,47 +72,23 @@ public final class GameEngine implements Serializable {
      *
      * @param delta the delta
      */
-    private void getPositionInfo(Point delta) {
-        if (isGameComplete()) {
-            return;
+    private static PositionInfo getPositionInfo(Point delta) {
+        if (GameStatus.getGameStatus().isGameComplete()) {
+            return null;
         }
 
-        Point keeperPosition = currentLevel.getKeeperPosition();
-        GameObject keeper = currentLevel.objectsGrid.getGameObjectAt(keeperPosition);
+        Point keeperPosition = getCurrentLevel().getKeeperPosition();
+        char keeper = getCurrentLevel().getObjectsGrid().getGameObjectAt(keeperPosition);
         boolean keeperMoved = false;
         Point targetObjectPoint = GameGrid.translatePoint(keeperPosition, delta);
-        GameObject keeperTarget = currentLevel.objectsGrid.getGameObjectAt(targetObjectPoint);
+        char keeperTarget = getCurrentLevel().getObjectsGrid().getGameObjectAt(targetObjectPoint);
         PositionInfo positionInfo = new PositionInfo(delta, keeperPosition, keeper, keeperMoved, targetObjectPoint, keeperTarget);
 
         if (GameLogger.isDebugActive()) {
-            printState(positionInfo);
+            GameLogger.printState(positionInfo);
         }
 
-        // method extracted
-        try {
-            History.getHistory().push(currentLevel.deepClone());
-            move(positionInfo);
-        } catch (AssertionError e) {
-            System.out.println(e.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Print state.
-     *
-     * @param positionInfo the position info
-     */
-// method extracted
-    private void printState(PositionInfo positionInfo) {
-        System.out.println("Current level state:");
-        System.out.println(currentLevel.toString());
-        System.out.println("Keeper pos: " + positionInfo.getKeeperPosition());
-        System.out.println("Movement source obj: " + positionInfo.getKeeper());
-        System.out.printf("Target object: %s at [%s]", positionInfo.getKeeperTarget(), positionInfo.getTargetObjectPoint());
+        return positionInfo;
     }
 
     /**
@@ -222,39 +97,66 @@ public final class GameEngine implements Serializable {
      * @param positionInfo the position info
      */
 // accept parameter object positionInfo
-    private void move(PositionInfo positionInfo) {
+    private static void move(PositionInfo positionInfo) {
 
         // switch replaced with enhanced switch
         switch (positionInfo.getKeeperTarget()) {
 
-            case WALL -> {
-            }
+            case 'W':
+                break;
 
-            case CRATE -> {
-                GameObject crateTarget = currentLevel.getTargetObject(positionInfo.getTargetObjectPoint(), positionInfo.getDelta());
-                if (crateTarget != GameObject.FLOOR) {
+            case 'C':
+                char crateTarget = getCurrentLevel().getTargetObject(positionInfo.getTargetObjectPoint(), positionInfo.getDelta());
+                if (crateTarget != ' ') {
                     break;
                 }
-
-                moveObject(positionInfo.getDelta(), positionInfo.getTargetObjectPoint(), positionInfo.getKeeperTarget());
-                moveObject(positionInfo.getDelta(), positionInfo.getKeeperPosition(), positionInfo.getKeeper());
-                positionInfo.setKeeperMoved(true);
-            }
-
-            case FLOOR -> {
-                moveObject(positionInfo.getDelta(), positionInfo.getKeeperPosition(), positionInfo.getKeeper());
+                moveTargetObject(positionInfo);
+                moveKeeper(positionInfo);
                 positionInfo.setKeeperMoved(true);
                 break;
-            }
 
-            default -> {
+            case 'U':
+            case 'D':
+            case 'L':
+            case 'R':
+                Point targetPipe = getCurrentLevel().getAnotherPipe(positionInfo.getTargetObjectPoint());
+                if (getCurrentLevel().getObjectsGrid().getGameObjectAt(targetPipe) != 'C' && targetPipe != null) {
+                    positionInfo.setDelta(positionInfo.getKeeperPosition(), targetPipe);
+                    moveKeeper(positionInfo);
+                    positionInfo.setKeeperMoved(true);
+                }
+                break;
+
+            case ' ':
+                moveKeeper(positionInfo);
+                positionInfo.setKeeperMoved(true);
+                break;
+
+            default:
                 GameLogger.showSevere("The object to be moved was not a recognised GameObject.");
                 throw new AssertionError("This should not have happened. Report this problem to the developer.");
-            }
-
         }
+    }
 
-        checkKeeperPosition(positionInfo);
+    private static void moveTargetObject(PositionInfo position) {
+        Point delta = position.getDelta();
+        Point targetPosition = position.getTargetObjectPoint();
+        char target = position.getKeeperTarget();
+        putObject(delta, targetPosition, target);
+    }
+
+    private static void moveKeeper(PositionInfo position) {
+        Point delta = position.getDelta();
+        Point keeperPosition = position.getKeeperPosition();
+        char keeper = position.getKeeper();
+        putObject(delta, keeperPosition, keeper);
+    }
+
+    private static void putObject(Point delta, Point position, char object) {
+        GameGrid objectsGrid = getCurrentLevel().getObjectsGrid();
+        Point targetPoint = GameGrid.translatePoint(position, delta);
+        objectsGrid.putGameObjectAt(objectsGrid.getGameObjectAt(targetPoint), position);
+        objectsGrid.putGameObjectAt(object, targetPoint);
     }
 
     /**
@@ -262,38 +164,25 @@ public final class GameEngine implements Serializable {
      *
      * @param positionInfo the position info
      */
-    private void checkKeeperPosition(PositionInfo positionInfo) {
+    private static void checkGameStatus(PositionInfo positionInfo) {
         // if structure improved
         if (!positionInfo.isKeeperMoved())
             return;
 
         positionInfo.getKeeperPosition().translate((int) positionInfo.getDelta().getX(), (int) positionInfo.getDelta().getY());
-        movesCount++;
-        movesCountLevel++;
+        getStatus().incrementMovesCount();
+        getStatus().incrementMovesCountLevel();
 
-        if (currentLevel.isComplete()) {
-            HighScore.updateMap(currentLevel.getIndex(), movesCountLevel);
-            GameWindow.showHighScore();
+        if (getStatus().getCurrentLevel().isComplete()) {
+            HighScore.updateMap(getCurrentLevel().getIndex(), getStatus().getMovesCountLevel());
+            GameDialog.showHighScore();
 
             if (GameLogger.isDebugActive()) {
                 System.out.println("Level complete!");
             }
 
-            movesCountLevel = 0;
-            currentLevel = getNextLevel();
+            getStatus().setCurrentLevel(getNextLevel());
         }
-    }
-
-    /**
-     * Move object.
-     *
-     * @param delta          the delta
-     * @param keeperPosition the keeper position
-     * @param keeper         the keeper
-     */
-    private void moveObject(Point delta, Point keeperPosition, GameObject keeper) {
-        currentLevel.objectsGrid.putGameObjectAt(currentLevel.objectsGrid.getGameObjectAt(GameGrid.translatePoint(keeperPosition, delta)), keeperPosition);
-        currentLevel.objectsGrid.putGameObjectAt(keeper, GameGrid.translatePoint(keeperPosition, delta));
     }
 
     /**
@@ -301,126 +190,51 @@ public final class GameEngine implements Serializable {
      *
      * @return the next level
      */
-    private Level getNextLevel() {
+    public static Level getNextLevel() {
+        getStatus().setMovesCountLevel(0);
         History.getHistory().clear();
 
-        if (currentLevel == null) {
-            return levels.get(0);
+        if (getCurrentLevel() == null) {
+            return getStatus().getLevels().get(0);
         }
 
-        int currentLevelIndex = currentLevel.getIndex();
-        if (currentLevelIndex < levels.size()) {
-            return levels.get(currentLevelIndex);
+        int currentLevelIndex = getCurrentLevel().getIndex();
+        if (currentLevelIndex < getStatus().getLevels().size()) {
+            return getStatus().getLevels().get(currentLevelIndex);
         }
 
-        gameComplete = true;
+        getStatus().setGameComplete();
         return null;
     }
 
-    /**
-     * Gets current level.
-     *
-     * @return the current level
-     */
-    public Level getCurrentLevel() {
-        return currentLevel;
+    public static void loadGame(Stage primaryStage) {
+        try {
+            Object fileInput;
+            fileInput = GameFile.loadGameFile(primaryStage);
+
+            if (fileInput != null) {
+                if (fileInput instanceof GameStatus) {
+                    GameStatus.createGameStatus((GameStatus) fileInput);
+                } else {
+                    GameStatus.createGameStatus((FileInputStream) fileInput);
+                }
+                History.getHistory().clear();
+                GameWindow.reloadGrid();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
-    /**
-     * Sets current level.
-     *
-     * @param level the level
-     */
-    public void setCurrentLevel(Level level) {
-        currentLevel = level;
+    public static void navigateToStart() {
+        HighScore.updateMap(0, GameStatus.getGameStatus().getMovesCount());
+        GameDialog.showVictoryMessage();
+        History.getHistory().clear();
+        GameFile.loadDefaultSaveFile();
+        try {
+            GameWindow.createStartMenu();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
-    /**
-     * Gets game name.
-     *
-     * @return the game name
-     */
-    public String getGameName() {
-        return GAME_NAME;
-    }
-
-    /**
-     * Gets moves count.
-     *
-     * @return the moves count
-     */
-    public int getMovesCount() {
-        return movesCount;
-    }
-
-    public int getMovesCountLevel() {
-        return movesCountLevel;
-    }
-
-    /**
-     * Gets map set name.
-     *
-     * @return the map set name
-     */
-    public String getMapSetName() {
-        return mapSetName;
-    }
-
-    /**
-     * Sets map set name.
-     *
-     * @param name the name
-     */
-    public void setMapSetName(String name) {
-        mapSetName = name;
-    }
-
-    /**
-     * Gets levels.
-     *
-     * @return the levels
-     */
-    public final List<Level> getLevels() {
-        return levels;
-    }
-
-    /**
-     * Sets levels.
-     *
-     * @param newLevels the new levels
-     */
-    public void setLevels(List<Level> newLevels) {
-        levels = newLevels;
-    }
-
-    /**
-     * Get serializable levels level [ ].
-     *
-     * @return the level [ ]
-     */
-    public Level[] getSerializableLevels() {
-        return serializableLevels;
-    }
-
-    /**
-     * Sets serializable levels.
-     *
-     * @param levels the levels
-     */
-    public void setSerializableLevels(Level[] levels) {
-        serializableLevels = levels;
-    }
-
-    @Override
-    public String toString() {
-        return "GameEngine:" + "\n" + currentLevel + "\n" + levels + "\n" + movesCount + "\n";
-    }
-
-    /**
-     * avoid singleton destroyed by serialization
-     * @return
-     */
-//    private Object readResolve() {
-//        return gameEngine;
-//    }
 }

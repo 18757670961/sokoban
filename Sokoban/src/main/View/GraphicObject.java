@@ -1,14 +1,6 @@
 package View;
 
-import Controller.GameEngine;
-import Modal.GameObject;
-import Debug.GameLogger;
-import javafx.animation.FadeTransition;
-import javafx.animation.Timeline;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 
 /**
  * The type Graphic object.
@@ -19,22 +11,23 @@ public class GraphicObject extends Rectangle {
      *
      * @param obj the obj
      */
-    public GraphicObject(GameObject obj) {
-        Paint color = setColor(obj);
+    public GraphicObject(char obj) {
 
-        this.setFill(color);
-        this.setHeight(30);
-        this.setWidth(30);
-
-        if (obj != GameObject.WALL) {
-            this.setArcHeight(50);
-            this.setArcWidth(50);
-        }
-
-        if (GameLogger.isDebugActive()) {
-            this.setStroke(Color.RED);
-            this.setStrokeWidth(0.25);
-        }
+//        Paint color = setColor(obj);
+//
+//        this.setFill(color);
+//        this.setHeight(30);
+//        this.setWidth(30);
+//
+//        if (obj != 'W') {
+//            this.setArcHeight(50);
+//            this.setArcWidth(50);
+//        }
+//
+//        if (GameLogger.isDebugActive()) {
+//            this.setStroke(Color.RED);
+//            this.setStrokeWidth(0.25);
+//        }
     }
 
     /**
@@ -43,41 +36,42 @@ public class GraphicObject extends Rectangle {
      * @param obj the obj
      * @return the color
      */
-    private Paint setColor(GameObject obj) {
-        Paint color;
-
-        // switch replaced with enhanced switch
-        switch (obj) {
-            case WALL -> color = Color.BLACK;
-            case CRATE -> color = Color.ORANGE;
-            case DIAMOND -> {
-                color = Color.DEEPSKYBLUE;
-                if (GameLogger.isDebugActive()) {
-                    setTransition();
-                }
-            }
-            case KEEPER -> color = Color.RED;
-            case FLOOR -> color = Color.WHITE;
-            case CRATE_ON_DIAMOND -> color = Color.DARKCYAN;
-            default -> {
-                String message = "Error in Level constructor. Object not recognized.";
-                GameLogger.showSevere(message);
-                throw new AssertionError(message);
-            }
-        }
-        return color;
-    }
+//    private Paint setColor(char obj) {
+//        Paint color;
+//
+//        // switch replaced with enhanced switch
+//        switch (obj) {
+//            case 'W' -> color = Color.BLACK;
+//            case 'C' -> color = Color.ORANGE;
+//            case 'D' -> {
+//                color = Color.DEEPSKYBLUE;
+//                if (GameLogger.isDebugActive()) {
+//                    setTransition();
+//                }
+//            }
+//            case 'S' -> color = Color.RED;
+//            case ' ' -> color = Color.WHITE;
+//            case 'O' -> color = Color.DARKCYAN;
+//            default -> {
+//                String message = "Error in Level constructor. Object not recognized.";
+//                GameLogger.showSevere(message);
+//                throw new AssertionError(message);
+//            }
+//        }
+//
+//        return color;
+//    }
 
     /**
      * Sets transition.
      */
 // method extracted
-    private void setTransition() {
-        FadeTransition fadeTransition = new FadeTransition(Duration.millis(1000), this); // variable name changed
-        fadeTransition.setFromValue(1.0);
-        fadeTransition.setToValue(0.2);
-        fadeTransition.setCycleCount(Timeline.INDEFINITE);
-        fadeTransition.setAutoReverse(true);
-        fadeTransition.play();
-    }
+//    private void setTransition() {
+//        FadeTransition fadeTransition = new FadeTransition(Duration.millis(1000), this); // variable name changed
+//        fadeTransition.setFromValue(1.0);
+//        fadeTransition.setToValue(0.2);
+//        fadeTransition.setCycleCount(Timeline.INDEFINITE);
+//        fadeTransition.setAutoReverse(true);
+//        fadeTransition.play();
+//    }
 }
