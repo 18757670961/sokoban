@@ -2,7 +2,7 @@ MapSetName: Example Game!
 LevelName: Simple Start
 WWWWWWWWWWWWWWWWWWWW
 W    W             W
-W C  W D           W
+W C  W G           W
 w    w      WWWWWWWW
 w    WWWW  WWWWWWWWW
 w            WWWWWWW
@@ -21,13 +21,13 @@ wWWWWWW   WWWWWWWWWW
 wWWWWWW   SWWWWWWWWW
 wwwwwwwwWwwwwwwwwwww
 
-LevelName: And Another Thing!
+LevelName: AnG Another Thing!
 WWWWWWWWWWWWWWWWWWWW
 W    W             W
 W C  W C           W
 w C  w      WW WWWWW
-wD   WWWWWW W C   DW
-w      D           W
+wG   WWWWWW W C   GW
+w      G           W
 w           W      W
 w           WWWWWWWW
 w           WWWWWWWW
@@ -37,7 +37,7 @@ w      S    WWWWWWWW
 wW          WWWWWWWW
 wWW       WWW  WWWWW
 wWWW      W     WWWW
-wWWWW     WD    WWWW
+wWWWW     WG    WWWW
 wWWWWW    WWWW WWWWW
 wWWWWWW            W
 wWWWWWWWWW         W
@@ -49,8 +49,8 @@ W    WWW  WWWWWWWWWW
 W                  W
 W    WWWW WWWWWWWW W
 W   CC    WWWWWWWW W
-W   CDD            W
-WWWWWDWWWWWWWWWWWW W
+W   CGG            W
+WWWWWGWWWWWWWWWWWW W
 W                  W
 W WWW W            W
 W W   W            W
@@ -62,20 +62,20 @@ WW   WW            W
 WW   WW            W
 WW WWWW            W
 W               SC W
-W   WWW           DW
+W   WWW           GW
 WWWWWWWWWWWWWWWWWWWW
 
 LevelName: Penultimately...
 WWWWWWWWWWWWWWWWWWWW
-W  WWWD            W
+W  WWWG            W
 W  WWWWW WWWWWWWW WW
-W     DW W       C W
+W     GW W       C W
 WW WWWWW W       C W
-WW    DW W         W
+WW    GW W         W
 WW  W  W W WWWWWW WW
 WWW W WW           W
 WWW W WW W WWWWWWWWW
-W     WW WWWD      W
+W     WW WWWG      W
 W  W  WW WWW       W
 WW WWWWW WWW       W
 WW WWWWW WWWW WWWWWW
@@ -84,27 +84,27 @@ WW  WWWW           W
 WWWWW  W  WWWWWWCCWW
 WWWWW             WW
 WWWWW W         C WW
-WD      WWWWWWWWWWWW
+WG      WWWWWWWWWWWW
 WWWWWWWWWWWWWWWWWWWW
 
-LevelName: And finally :-)
+LevelName: AnG finally :-)
 WWWWWWWWWWWWWWWWWWWW
 WWWWWWWWWWWWWWWW   W
-Wwwd       d      DW
+WwwG       G      GW
 Wwwww wcwwwww ww  ww
 Wwwww  c wwww www wW
 W     w  wwww   w wW
 W wwwww wwwww w w wW
 W wwwww       w wcwW
 W wwwww wwwww w  c W
-Wd            w    W
+WG            w    W
 Wwwwwwwww www wwwwwW
-Wwdwwwwwwdwww s    W
+WwGwwwwwwGwww s    W
 W c       wwwwwwww W
 W cwwwwww wwwwww   W
 W  wwwwww www    wwW
-Ww wwwwww  ww wwwwdW
-W  w      cdw      W
+Ww wwwwww  ww wwwwGW
+W  w      cGw      W
 W          c       W
 Wwww  wwwww    wwwwW
 WWWWWWWWWWWWWWWWWWWW

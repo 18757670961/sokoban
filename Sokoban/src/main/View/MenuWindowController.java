@@ -1,5 +1,6 @@
 package View;
 
+import Controller.GameEngine;
 import Main.Main;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,7 +14,7 @@ import java.util.ResourceBundle;
 /**
  * Created by Nuno on 06/02/2018.
  */
-public class MenuController implements Initializable {
+public class MenuWindowController implements Initializable {
 
     @FXML private Button startButton;
     @FXML private Button loadButton;
@@ -33,7 +34,7 @@ public class MenuController implements Initializable {
         loadButton.setOnAction(event -> {
             try {
                 GameWindow.createGameWindow();
-                GameWindow.loadGame();
+                GameEngine.loadGame(GameWindow.getPrimaryStage());
             } catch (IOException e) {
                 e.printStackTrace();
             }

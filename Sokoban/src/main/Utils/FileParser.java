@@ -1,6 +1,7 @@
-package Controller;
+package Utils;
 
-import Debug.GameLogger;
+import Controller.GameEngine;
+import Utils.GameLogger;
 import Modal.GameStatus;
 import Modal.Level;
 
@@ -24,7 +25,7 @@ public class FileParser {
             GameStatus.getGameStatus().setLevels(prepareFileReader(input));
             GameStatus.getGameStatus().setCurrentLevel(GameEngine.getNextLevel());
         } catch (NoSuchElementException e) {
-            GameLogger.showWarning("Cannot load the default save file: " + Arrays.toString(e.getStackTrace()));
+            e.printStackTrace();
         }
     }
 

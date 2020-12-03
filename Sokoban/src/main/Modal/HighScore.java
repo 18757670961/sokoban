@@ -1,6 +1,6 @@
 package Modal;
 
-import Controller.GameFile;
+import Utils.GameFile;
 
 import java.io.*;
 import java.util.HashMap;

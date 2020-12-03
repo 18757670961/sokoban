@@ -1,25 +1,13 @@
 package Main;
 
-import Controller.GameEngine;
-import Controller.GameFile;
-import Debug.GameLogger;
-import Modal.GameStatus;
+import Utils.GameFile;
+import Utils.GameLogger;
 import Modal.HighScore;
-import Modal.History;
 import View.GameWindow;
 import javafx.application.Application;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.net.URL;
 
 /**
  * The type Main.

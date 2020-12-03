@@ -1,10 +1,15 @@
 package Controller;
 
-import Debug.GameLogger;
+import Utils.GameFile;
+import Utils.GameLogger;
 import Modal.*;
 import View.GameDialog;
+import View.GameWindow;
+import javafx.stage.Stage;
 
 import java.awt.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -19,9 +24,13 @@ public final class GameEngine {
         return GameStatus.getGameStatus();
     }
 
+    private static Level getCurrentLevel() {
+        return getStatus().getCurrentLevel();
+    }
+
     public static void toNextLevel() {
         getStatus().setMovesCount(0);
-        if (getStatus().getCurrentLevel().getIndex() < getStatus().getLevels().size()) {
+        if (getCurrentLevel().getIndex() < getStatus().getLevels().size()) {
             History.resetHistory();
             getStatus().setCurrentLevel(getNextLevel());
         }
@@ -33,7 +42,7 @@ public final class GameEngine {
         History.resetHistory();
         History.getHistory().clear();
 
-        int currentLevelIndex = getStatus().getCurrentLevel().getIndex();
+        int currentLevelIndex = getCurrentLevel().getIndex();
         if (currentLevelIndex > 1) {
             getStatus().setCurrentLevel(getStatus().getLevels().get(currentLevelIndex - 2));
         }
@@ -68,11 +77,11 @@ public final class GameEngine {
             return null;
         }
 
-        Point keeperPosition = getStatus().getCurrentLevel().getKeeperPosition();
-        char keeper = getStatus().getCurrentLevel().objectsGrid.getGameObjectAt(keeperPosition);
+        Point keeperPosition = getCurrentLevel().getKeeperPosition();
+        char keeper = getCurrentLevel().getObjectsGrid().getGameObjectAt(keeperPosition);
         boolean keeperMoved = false;
         Point targetObjectPoint = GameGrid.translatePoint(keeperPosition, delta);
-        char keeperTarget = getStatus().getCurrentLevel().objectsGrid.getGameObjectAt(targetObjectPoint);
+        char keeperTarget = getCurrentLevel().getObjectsGrid().getGameObjectAt(targetObjectPoint);
         PositionInfo positionInfo = new PositionInfo(delta, keeperPosition, keeper, keeperMoved, targetObjectPoint, keeperTarget);
 
         if (GameLogger.isDebugActive()) {
@@ -93,31 +102,39 @@ public final class GameEngine {
         // switch replaced with enhanced switch
         switch (positionInfo.getKeeperTarget()) {
 
-            case 'W' -> {
-            }
+            case 'W':
+                break;
 
-            case 'C' -> {
-                char crateTarget = getStatus().getCurrentLevel().getTargetObject(positionInfo.getTargetObjectPoint(), positionInfo.getDelta());
+            case 'C':
+                char crateTarget = getCurrentLevel().getTargetObject(positionInfo.getTargetObjectPoint(), positionInfo.getDelta());
                 if (crateTarget != ' ') {
                     break;
                 }
-
                 moveTargetObject(positionInfo);
                 moveKeeper(positionInfo);
                 positionInfo.setKeeperMoved(true);
-            }
+                break;
 
-            case ' ' -> {
+            case 'U':
+            case 'D':
+            case 'L':
+            case 'R':
+                Point targetPipe = getCurrentLevel().getAnotherPipe(positionInfo.getTargetObjectPoint());
+                if (getCurrentLevel().getObjectsGrid().getGameObjectAt(targetPipe) != 'C' && targetPipe != null) {
+                    positionInfo.setDelta(positionInfo.getKeeperPosition(), targetPipe);
+                    moveKeeper(positionInfo);
+                    positionInfo.setKeeperMoved(true);
+                }
+                break;
+
+            case ' ':
                 moveKeeper(positionInfo);
                 positionInfo.setKeeperMoved(true);
                 break;
-            }
 
-            default -> {
+            default:
                 GameLogger.showSevere("The object to be moved was not a recognised GameObject.");
                 throw new AssertionError("This should not have happened. Report this problem to the developer.");
-            }
-
         }
     }
 
@@ -136,9 +153,10 @@ public final class GameEngine {
     }
 
     private static void putObject(Point delta, Point position, char object) {
-        GameGrid objectsGrid = getStatus().getCurrentLevel().objectsGrid;
-        objectsGrid.putGameObjectAt(objectsGrid.getGameObjectAt(GameGrid.translatePoint(position, delta)), position);
-        objectsGrid.putGameObjectAt(object, GameGrid.translatePoint(position, delta));
+        GameGrid objectsGrid = getCurrentLevel().getObjectsGrid();
+        Point targetPoint = GameGrid.translatePoint(position, delta);
+        objectsGrid.putGameObjectAt(objectsGrid.getGameObjectAt(targetPoint), position);
+        objectsGrid.putGameObjectAt(object, targetPoint);
     }
 
     /**
@@ -156,7 +174,7 @@ public final class GameEngine {
         getStatus().incrementMovesCountLevel();
 
         if (getStatus().getCurrentLevel().isComplete()) {
-            HighScore.updateMap(getStatus().getCurrentLevel().getIndex(), getStatus().getMovesCountLevel());
+            HighScore.updateMap(getCurrentLevel().getIndex(), getStatus().getMovesCountLevel());
             GameDialog.showHighScore();
 
             if (GameLogger.isDebugActive()) {
@@ -176,16 +194,47 @@ public final class GameEngine {
         getStatus().setMovesCountLevel(0);
         History.getHistory().clear();
 
-        if (getStatus().getCurrentLevel() == null) {
+        if (getCurrentLevel() == null) {
             return getStatus().getLevels().get(0);
         }
 
-        int currentLevelIndex = getStatus().getCurrentLevel().getIndex();
+        int currentLevelIndex = getCurrentLevel().getIndex();
         if (currentLevelIndex < getStatus().getLevels().size()) {
             return getStatus().getLevels().get(currentLevelIndex);
         }
 
         getStatus().setGameComplete();
         return null;
+    }
+
+    public static void loadGame(Stage primaryStage) {
+        try {
+            Object fileInput;
+            fileInput = GameFile.loadGameFile(primaryStage);
+
+            if (fileInput != null) {
+                if (fileInput instanceof GameStatus) {
+                    GameStatus.createGameStatus((GameStatus) fileInput);
+                } else {
+                    GameStatus.createGameStatus((FileInputStream) fileInput);
+                }
+                History.getHistory().clear();
+                GameWindow.reloadGrid();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void navigateToStart() {
+        HighScore.updateMap(0, GameStatus.getGameStatus().getMovesCount());
+        GameDialog.showVictoryMessage();
+        History.getHistory().clear();
+        GameFile.loadDefaultSaveFile();
+        try {
+            GameWindow.createStartMenu();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

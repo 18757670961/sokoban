@@ -1,15 +1,6 @@
 package View;
 
-import Controller.GameEngine;
-import Debug.GameLogger;
-import javafx.animation.FadeTransition;
-import javafx.animation.Timeline;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 
 /**
  * The type Graphic object.

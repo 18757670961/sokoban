@@ -1,15 +1,15 @@
-MapSetName: Game debug!
+MapSetName: Game Gebug!
 LevelName: Just this level
 WWWWWWWWWWWWW WWWWWW
 W    W             W 
-W    W D  C  S     W
+W    W G  C  S     W
 w    w      WWWWWWWW
 wwwwwwwwWwwwwwwwwwww
 
 LevelName: Just this level
 WWWWWWWWWWWWW WWWWWW
-W    W D  C        W
-W    W D  C  S     W
+W    W G  C        W
+W    W G  C  S     W
 w    w      WWWWWWWW
 wwwwwwwwWwwwwwwwwwww
 
@@ -23,13 +23,13 @@ wwwwwwwwWwwwwwwwwwww
 LevelName: Just this level
 WWWWWWWWWWWWW WWWWWW
 W    W             W
-W    W D  C  S     W
+W    W G  C  S     W
 w    w      WWWWWWWW
 wwwwwwwwWwwwwwwwwwww
 
 LevelName: Just this level
 WWWWWWWWWWWWW WWWWWW
 W    W             W
-W    W D  C  S     W
+W    W G  C  S     W
 w    w      WWWWWWWW
 wwwwwwwwWwwwwwwwwwww

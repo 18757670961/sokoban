@@ -1,7 +1,6 @@
 package Modal;
 
-import Controller.GameEngine;
-import Debug.GameLogger;
+import Utils.GameLogger;
 
 import java.awt.*;
 import java.io.Serializable;

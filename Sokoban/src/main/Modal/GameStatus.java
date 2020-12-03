@@ -1,16 +1,13 @@
 package Modal;
 
-import Controller.FileParser;
-import Controller.GameEngine;
-import Debug.GameLogger;
+import Utils.FileParser;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Observable;
 
-public final class GameStatus implements Serializable {
+public final class GameStatus extends Observable implements Serializable {
     private static GameStatus gameStatus;
     private final String GAME_NAME = "Sokoban";
     private String mapSetName = "";
@@ -162,5 +159,10 @@ public final class GameStatus implements Serializable {
      */
     public void setSerializableLevels(Level[] levels) {
         serializableLevels = levels;
+    }
+
+    public void setUpdated(){
+        setChanged();
+        notifyObservers();
     }
 }

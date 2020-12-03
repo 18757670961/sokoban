@@ -1,6 +1,6 @@
 package Modal;
 
-import Debug.GameLogger;
+import Utils.GameLogger;
 
 import java.awt.*;
 import java.io.*;
@@ -20,6 +20,10 @@ public final class Level implements Iterable<Character>, Serializable {
      */
     public final GameGrid diamondsGrid;
     /**
+     * The Keeper position.
+     */
+    private Point keeperPosition;
+    /**
      * The Name.
      */
     private final String name;
@@ -31,10 +35,6 @@ public final class Level implements Iterable<Character>, Serializable {
      * The Number of diamonds.
      */
     private int numberOfDiamonds = 0;
-    /**
-     * The Keeper position.
-     */
-    private Point keeperPosition;
 
     /**
      * Instantiates a new Level.
@@ -85,7 +85,7 @@ public final class Level implements Iterable<Character>, Serializable {
             for (int col = 0; col < rawLevel.get(row).length(); col++) {
                 char curTile = rawLevel.get(row).charAt(col);
 
-                if (curTile == 'D') {
+                if (curTile == 'G') {
                     numberOfDiamonds++;
                     diamondsGrid.putGameObjectAt(curTile, row, col);
                     curTile = ' ';
@@ -117,12 +117,54 @@ public final class Level implements Iterable<Character>, Serializable {
         for (int row = 0; row < objectsGrid.ROWS; row++) {
             for (int col = 0; col < objectsGrid.COLUMNS; col++) {
                 // if condition simplified
-                if (getObject(row, col) == 'C' && getDiamond(row, col) == 'D') {
+                if (getObject(row, col) == 'C' && getDiamond(row, col) == 'G') {
                     cratedDiamondsCount++;
                 }
             }
         }
         return cratedDiamondsCount >= numberOfDiamonds;
+    }
+
+    /**
+     * Gets target object.
+     *
+     * @param source the source
+     * @param delta  the delta
+     * @return the target object
+     */
+    public char getTargetObject(Point source, Point delta) {
+        return objectsGrid.getTargetFromSource(source, delta);
+    }
+
+    /**
+     * scan the map for another pipe as exit point
+     * @param currentPipe
+     * @return
+     */
+    public Point getAnotherPipe(Point currentPipe) {
+        for (int row = 0; row < objectsGrid.ROWS; row++) {
+            for (int col = 0; col < objectsGrid.COLUMNS; col++) {
+                if (row == currentPipe.y && col == currentPipe.x) {
+                    continue;
+                }
+                char object = getObject(row, col);
+                switch (object) {
+                    case 'U':
+                        return new Point(col - 1, row);
+                    case 'D':
+                        return new Point(col + 1, row);
+                    case 'L':
+                        return new Point(col, row - 1);
+                    case 'R':
+                        return new Point(col, row + 1);
+                }
+            }
+        }
+        return null;
+    }
+
+    public GameGrid getObjectsGrid() {
+        return objectsGrid;
     }
 
     /**
@@ -174,17 +216,6 @@ public final class Level implements Iterable<Character>, Serializable {
         return keeperPosition;
     }
 
-    /**
-     * Gets target object.
-     *
-     * @param source the source
-     * @param delta  the delta
-     * @return the target object
-     */
-    public char getTargetObject(Point source, Point delta) {
-        return objectsGrid.getTargetFromSource(source, delta);
-    }
-
     @Override
     public String toString() {
         return objectsGrid.toString();
@@ -226,7 +257,7 @@ public final class Level implements Iterable<Character>, Serializable {
             column++;
 
             // if structure improved
-            if (diamond != 'D') {
+            if (diamond != 'G') {
                 return retObj;
             }
             if (object == 'C') {

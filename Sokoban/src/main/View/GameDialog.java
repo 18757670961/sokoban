@@ -55,7 +55,7 @@ public class GameDialog {
     /**
      * Show victory message.
      */
-    static void showVictoryMessage() {
+    public static void showVictoryMessage() {
         String dialogTitle = "Game Over !";
         String dialogMessage = "You completed " + GameStatus.getGameStatus().getMapSetName() + " in " + GameStatus.getGameStatus().getMovesCount() + " moves!\n" +
                 "High score in history: " + HighScore.getHighScore(0) + " moves";

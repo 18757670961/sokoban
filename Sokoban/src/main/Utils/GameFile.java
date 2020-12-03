@@ -1,14 +1,12 @@
-package Controller;
+package Utils;
 
-import Debug.GameLogger;
-import Controller.GameEngine;
+import Utils.GameLogger;
 import Modal.GameStatus;
 import Modal.Level;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,8 +34,13 @@ public final class GameFile {
      *
      * @param primaryStage the primary stage
      */
-    public static void loadDefaultSaveFile() throws FileNotFoundException {
-        FileInputStream inputStream = new FileInputStream(getFile(defaultSaveFile));
+    public static void loadDefaultSaveFile()  {
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(getFile(defaultSaveFile));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         GameStatus.createGameStatus(inputStream);
     }
 

@@ -9,7 +9,7 @@ public class PositionInfo {
     /**
      * The Delta.
      */
-    private final Point delta;
+    private Point delta;
     /**
      * The Keeper position.
      */
@@ -111,5 +111,11 @@ public class PositionInfo {
      */
     public char getKeeperTarget() {
         return keeperTarget;
+    }
+
+    public void setDelta(Point oldPos, Point newPos) {
+        int x = newPos.x - oldPos.x;
+        int y = newPos.y - oldPos.y;
+        delta = new Point(x, y);
     }
 }

@@ -1,6 +1,7 @@
 package Controller;
 
-import Debug.GameLogger;
+import Utils.GameFile;
+import Utils.GameLogger;
 import Modal.GameStatus;
 import Modal.History;
 import View.GameWindow;
@@ -38,11 +39,11 @@ public final class KeyHandler {
                 break;
 
             case F1:
-                GameWindow.saveGame(); // save game
+                GameFile.saveGameFile(GameWindow.getPrimaryStage()); // save game
                 break;
 
             case F2:
-                GameWindow.loadGame(); // load game
+                GameEngine.loadGame(GameWindow.getPrimaryStage()); // load game
                 break;
 
             case Q:
@@ -76,7 +77,7 @@ public final class KeyHandler {
         if (GameStatus.getGameStatus().getMovesCountLevel() == 0) {
             GameWindow.reloadGrid();
         } else {
-            GameWindow.reloadPartialGrid();
+            GameWindow.reloadPartialGrid(null);
         }
     }
 }

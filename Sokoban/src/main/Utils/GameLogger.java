@@ -1,7 +1,5 @@
-package Debug;
+package Utils;
 
-import Controller.GameEngine;
-import Controller.GameFile;
 import Controller.PositionInfo;
 import Modal.GameStatus;
 
