@@ -5,30 +5,34 @@ import javafx.scene.shape.Rectangle;
 /**
  * The type Graphic object.
  */
-public class GraphicObject extends Rectangle {
+public interface GraphicObject {
+
+    public void updateState();
+
+
     /**
      * Instantiates a new Graphic object.
      *
      * @param obj the obj
      */
-    public GraphicObject(char obj) {
-
-//        Paint color = setColor(obj);
+//    public GraphicObject(char obj) {
 //
-//        this.setFill(color);
-//        this.setHeight(30);
-//        this.setWidth(30);
-//
-//        if (obj != 'W') {
-//            this.setArcHeight(50);
-//            this.setArcWidth(50);
-//        }
-//
-//        if (GameLogger.isDebugActive()) {
-//            this.setStroke(Color.RED);
-//            this.setStrokeWidth(0.25);
-//        }
-    }
+////        Paint color = setColor(obj);
+////
+////        this.setFill(color);
+////        this.setHeight(30);
+////        this.setWidth(30);
+////
+////        if (obj != 'W') {
+////            this.setArcHeight(50);
+////            this.setArcWidth(50);
+////        }
+////
+////        if (GameLogger.isDebugActive()) {
+////            this.setStroke(Color.RED);
+////            this.setStrokeWidth(0.25);
+////        }
+//    }
 
     /**
      * Sets color.

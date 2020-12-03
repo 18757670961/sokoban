@@ -23,6 +23,8 @@ public final class Level implements Iterable<Character>, Serializable {
      * The Keeper position.
      */
     private Point keeperPosition;
+    private Point gatePosition;
+    private Point padPosition;
     /**
      * The Name.
      */
@@ -51,6 +53,8 @@ public final class Level implements Iterable<Character>, Serializable {
         name = levelName;
         index = levelIndex;
         keeperPosition = new Point(0, 0);
+        gatePosition = new Point(0, 0);
+        padPosition = new Point(0, 0);
 
         int rows = rawLevel.size();
         int columns = rawLevel.get(0).trim().length();
@@ -91,6 +95,12 @@ public final class Level implements Iterable<Character>, Serializable {
                     curTile = ' ';
                 } else if (curTile == 'S') {
                     keeperPosition = new Point(row, col);
+                } else if (curTile == '&') {
+                    padPosition = new Point(row, col);
+                    diamondsGrid.putGameObjectAt(curTile, row, col);
+                    curTile = ' ';
+                } else if (curTile == '$') {
+                    gatePosition = new Point(row, col);
                 }
 
                 objectsGrid.putGameObjectAt(curTile, row, col);
@@ -105,6 +115,14 @@ public final class Level implements Iterable<Character>, Serializable {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
         return (Level) objectInputStream.readObject();
+    }
+
+    public void checkGate() {
+        if (objectsGrid.getGameObjectAt(padPosition) == ' ') {
+            objectsGrid.putGameObjectAt('$', gatePosition);
+        } else {
+            objectsGrid.putGameObjectAt(' ', gatePosition);
+        }
     }
 
     /**
@@ -216,6 +234,10 @@ public final class Level implements Iterable<Character>, Serializable {
         return keeperPosition;
     }
 
+    public Point getGatePosition() {
+        return gatePosition;
+    }
+
     @Override
     public String toString() {
         return objectsGrid.toString();
@@ -257,15 +279,24 @@ public final class Level implements Iterable<Character>, Serializable {
             column++;
 
             // if structure improved
-            if (diamond != 'G') {
-                return retObj;
+            if (diamond == 'G') {
+                if (object == 'C') {
+                    retObj = 'O';
+                }
+                if (object == ' ') {
+                    retObj = diamond;
+                }
             }
-            if (object == 'C') {
-                retObj = 'O';
+
+            if (diamond == '&') {
+                if (object == 'C') {
+                    retObj = 'P';
+                }
+                if (object == ' ') {
+                    retObj = diamond;
+                }
             }
-            if (object == ' ') {
-                retObj = diamond;
-            }
+
             return retObj;
         }
 

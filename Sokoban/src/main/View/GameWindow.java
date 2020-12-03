@@ -273,7 +273,7 @@ public class GameWindow implements Observer {
                 file = "file:src/main/resources/image/playerD.png";
                 break;
             case 'O':
-                file = "file:src/main/resources/image/boxP.png";
+                file = "file:src/main/resources/image/boxO.png";
                 break;
             case 'U':
                 file = "file:src/main/resources/image/pipeU.png";
@@ -286,6 +286,15 @@ public class GameWindow implements Observer {
                 break;
             case 'R':
                 file = "file:src/main/resources/image/pipeR.png";
+                break;
+            case '$':
+                file = "file:src/main/resources/image/gate.bmp";
+                break;
+            case '&':
+                file = "file:src/main/resources/image/pressure_pad.png";
+                break;
+            case 'P':
+                file = "file:src/main/resources/image/boxP.png";
                 break;
             default:
                 return null;

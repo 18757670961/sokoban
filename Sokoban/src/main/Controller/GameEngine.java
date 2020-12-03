@@ -102,6 +102,7 @@ public final class GameEngine {
         // switch replaced with enhanced switch
         switch (positionInfo.getKeeperTarget()) {
 
+            case '$':
             case 'W':
                 break;
 
@@ -150,6 +151,7 @@ public final class GameEngine {
         Point keeperPosition = position.getKeeperPosition();
         char keeper = position.getKeeper();
         putObject(delta, keeperPosition, keeper);
+        getCurrentLevel().checkGate();
     }
 
     private static void putObject(Point delta, Point position, char object) {
