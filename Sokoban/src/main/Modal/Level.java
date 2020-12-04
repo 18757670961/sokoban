@@ -101,6 +101,10 @@ public final class Level implements Iterable<Character>, Serializable {
                     curTile = ' ';
                 } else if (curTile == '$') {
                     gatePosition = new Point(row, col);
+                } else if (curTile == 'O') {
+                    numberOfDiamonds++;
+                    diamondsGrid.putGameObjectAt('G', row, col);
+                    curTile = 'C';
                 }
 
                 objectsGrid.putGameObjectAt(curTile, row, col);
@@ -118,6 +122,9 @@ public final class Level implements Iterable<Character>, Serializable {
     }
 
     public void checkGate() {
+        if (gatePosition.x == 0 && gatePosition.y == 0) {
+            return;
+        }
         if (objectsGrid.getGameObjectAt(padPosition) == ' ') {
             objectsGrid.putGameObjectAt('$', gatePosition);
         } else {

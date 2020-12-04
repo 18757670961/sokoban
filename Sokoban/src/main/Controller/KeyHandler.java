@@ -1,5 +1,6 @@
 package Controller;
 
+import Modal.Level;
 import Utils.GameFile;
 import Utils.GameLogger;
 import Modal.GameStatus;
@@ -12,29 +13,34 @@ import java.io.IOException;
 
 public final class KeyHandler {
     public static void handleKey(KeyCode code) throws IOException {
+        Level currentLevel = GameStatus.getGameStatus().getCurrentLevel();
         // switch replaced with enhanced switch
         switch (code) {
             case W:
             case UP:
                 GameEngine.handleMovement(new Point(-1, 0));
+                currentLevel.getObjectsGrid().putGameObjectAt('T', currentLevel.getKeeperPosition());
                 reload();
                 break;
 
             case D:
             case RIGHT:
                 GameEngine.handleMovement(new Point(0, 1));
+                currentLevel.getObjectsGrid().putGameObjectAt('H', currentLevel.getKeeperPosition());
                 reload();
                 break;
 
             case S:
             case DOWN:
                 GameEngine.handleMovement(new Point(1, 0));
+                currentLevel.getObjectsGrid().putGameObjectAt('S', currentLevel.getKeeperPosition());
                 reload();
                 break;
 
             case A:
             case LEFT:
                 GameEngine.handleMovement(new Point(0, -1));
+                currentLevel.getObjectsGrid().putGameObjectAt('F', currentLevel.getKeeperPosition());
                 reload();
                 break;
 

@@ -247,61 +247,10 @@ public class GameWindow implements Observer {
     private static void addObjectToGrid(char gameObject, Point location) {
 //        GraphicObject graphicObject = new GraphicObject(gameObject);
 //        gameGrid.add(graphicObject, location.y, location.x);
-        ImageView img = setImage(gameObject);
+        ImageView img = ImageFactory.chooseImage(gameObject);
         if (img != null) {
             gameGrid.add(img, location.y, location.x);
         }
-    }
-
-    private static ImageView setImage(char obj) {
-        String file;
-
-        switch (obj) {
-            case 'W':
-                file = "file:src/main/resources/image/wall.bmp";
-                break;
-            case ' ':
-                file = "file:src/main/resources/image/floor.bmp";
-                break;
-            case 'C':
-                file = "file:src/main/resources/image/box.png";
-                break;
-            case 'G':
-                file = "file:src/main/resources/image/goal.png";
-                break;
-            case 'S':
-                file = "file:src/main/resources/image/playerD.png";
-                break;
-            case 'O':
-                file = "file:src/main/resources/image/boxO.png";
-                break;
-            case 'U':
-                file = "file:src/main/resources/image/pipeU.png";
-                break;
-            case 'D':
-                file = "file:src/main/resources/image/pipeD.png";
-                break;
-            case 'L':
-                file = "file:src/main/resources/image/pipeL.png";
-                break;
-            case 'R':
-                file = "file:src/main/resources/image/pipeR.png";
-                break;
-            case '$':
-                file = "file:src/main/resources/image/gate.bmp";
-                break;
-            case '&':
-                file = "file:src/main/resources/image/pressure_pad.png";
-                break;
-            case 'P':
-                file = "file:src/main/resources/image/boxP.png";
-                break;
-            default:
-                return null;
-        }
-
-        ImageView img = new ImageView(new Image(file));
-        return img;
     }
 
     /**
