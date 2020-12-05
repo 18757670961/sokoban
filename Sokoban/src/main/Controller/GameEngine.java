@@ -1,6 +1,6 @@
 package Controller;
 
-import Utils.GameFile;
+import Utils.GameIO;
 import Utils.GameLogger;
 import Modal.*;
 import View.GameDialog;
@@ -103,6 +103,7 @@ public final class GameEngine {
         switch (positionInfo.getKeeperTarget()) {
 
             case '$':
+            case '#':
             case 'W':
                 break;
 
@@ -209,30 +210,11 @@ public final class GameEngine {
         return null;
     }
 
-    public static void loadGame(Stage primaryStage) {
-        try {
-            Object fileInput;
-            fileInput = GameFile.loadGameFile(primaryStage);
-
-            if (fileInput != null) {
-                if (fileInput instanceof GameStatus) {
-                    GameStatus.createGameStatus((GameStatus) fileInput);
-                } else {
-                    GameStatus.createGameStatus((FileInputStream) fileInput);
-                }
-                History.getHistory().clear();
-                GameWindow.reloadGrid();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void navigateToStart() {
         HighScore.updateMap(0, GameStatus.getGameStatus().getMovesCount());
         GameDialog.showVictoryMessage();
         History.getHistory().clear();
-        GameFile.loadDefaultSaveFile();
+        GameIO.loadDefaultSaveFile();
         try {
             GameWindow.createStartMenu();
         } catch (IOException e) {

@@ -26,7 +26,6 @@ public class MenuWindowController implements Initializable {
         startButton.setOnAction(event -> {
             try {
                 GameWindow.createGameWindow();
-                GameWindow.reloadGrid();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -34,7 +33,7 @@ public class MenuWindowController implements Initializable {
         loadButton.setOnAction(event -> {
             try {
                 GameWindow.createGameWindow();
-                GameEngine.loadGame(GameWindow.getPrimaryStage());
+//                GameEngine.loadGame(GameWindow.getPrimaryStage());
             } catch (IOException e) {
                 e.printStackTrace();
             }

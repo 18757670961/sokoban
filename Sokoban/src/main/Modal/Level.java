@@ -126,9 +126,17 @@ public final class Level implements Iterable<Character>, Serializable {
             return;
         }
         if (objectsGrid.getGameObjectAt(padPosition) == ' ') {
-            objectsGrid.putGameObjectAt('$', gatePosition);
+            if (objectsGrid.getGameObjectAt(gatePosition) == 'C') {
+                objectsGrid.putGameObjectAt('#', gatePosition);
+            } else if (objectsGrid.getGameObjectAt(gatePosition) != '#') {
+                objectsGrid.putGameObjectAt('$', gatePosition);
+            }
         } else {
-            objectsGrid.putGameObjectAt(' ', gatePosition);
+            if (objectsGrid.getGameObjectAt(gatePosition) == '$') {
+                objectsGrid.putGameObjectAt(' ', gatePosition);
+            } else if (objectsGrid.getGameObjectAt(gatePosition) == '#') {
+                objectsGrid.putGameObjectAt('C', gatePosition);
+            }
         }
     }
 

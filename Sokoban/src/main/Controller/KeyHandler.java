@@ -1,7 +1,7 @@
 package Controller;
 
 import Modal.Level;
-import Utils.GameFile;
+import Utils.GameIO;
 import Utils.GameLogger;
 import Modal.GameStatus;
 import Modal.History;
@@ -12,7 +12,7 @@ import java.awt.*;
 import java.io.IOException;
 
 public final class KeyHandler {
-    public static void handleKey(KeyCode code) throws IOException {
+    public static Level handleKey(KeyCode code) throws IOException {
         Level currentLevel = GameStatus.getGameStatus().getCurrentLevel();
         // switch replaced with enhanced switch
         switch (code) {
@@ -20,55 +20,47 @@ public final class KeyHandler {
             case UP:
                 GameEngine.handleMovement(new Point(-1, 0));
                 currentLevel.getObjectsGrid().putGameObjectAt('T', currentLevel.getKeeperPosition());
-                reload();
-                break;
+                return null;
 
             case D:
             case RIGHT:
                 GameEngine.handleMovement(new Point(0, 1));
                 currentLevel.getObjectsGrid().putGameObjectAt('H', currentLevel.getKeeperPosition());
-                reload();
-                break;
+                return null;
 
             case S:
             case DOWN:
                 GameEngine.handleMovement(new Point(1, 0));
                 currentLevel.getObjectsGrid().putGameObjectAt('S', currentLevel.getKeeperPosition());
-                reload();
-                break;
+                return null;
 
             case A:
             case LEFT:
                 GameEngine.handleMovement(new Point(0, -1));
                 currentLevel.getObjectsGrid().putGameObjectAt('F', currentLevel.getKeeperPosition());
-                reload();
-                break;
+                return null;
 
-            case F1:
-                GameFile.saveGameFile(GameWindow.getPrimaryStage()); // save game
-                break;
-
-            case F2:
-                GameEngine.loadGame(GameWindow.getPrimaryStage()); // load game
-                break;
+//            case F1:
+//                GameIO.saveGameFile(GameWindow.getPrimaryStage()); // save game
+//                return null;
+//
+//            case F2:
+//                GameEngine.loadGame(GameWindow.getPrimaryStage()); // load game
+//                break;
 
             case Q:
-                GameWindow.reloadPartialGrid(History.traceHistory());
-                break;
+                return History.traceHistory();
 
             case E:
-                GameWindow.reloadPartialGrid(History.resetHistory());
-                break;
+                return History.resetHistory();
 
             case Z:
                 GameEngine.toPreviousLevel();
-                GameWindow.reloadGrid();
-                break;
+                return null;
 
             case X:
                 GameEngine.toNextLevel();
-                GameWindow.reloadGrid();
-                break;
+                return null;
 
             default:
                 // TODO: implement something funny.
@@ -77,13 +69,7 @@ public final class KeyHandler {
         if (GameLogger.isDebugActive()) {
             System.out.println(code);
         }
-    }
 
-    private static void reload() throws IOException {
-        if (GameStatus.getGameStatus().getMovesCountLevel() == 0) {
-            GameWindow.reloadGrid();
-        } else {
-            GameWindow.reloadPartialGrid(null);
-        }
+        return null;
     }
 }

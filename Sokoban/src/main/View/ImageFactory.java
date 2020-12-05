@@ -74,6 +74,10 @@ public class ImageFactory {
         return new ImageView(new Image("file:src/main/resources/image/gate.bmp"));
     }
 
+    public static ImageView createBoxOnGate() {
+        return new ImageView(new Image("file:src/main/resources/image/box&gate.png"));
+    }
+
     public static ImageView createPad() {
         return new ImageView(new Image("file:src/main/resources/image/pressure_pad.png"));
     }
@@ -112,6 +116,8 @@ public class ImageFactory {
                 return createPipeRight();
             case '$':
                 return createGate();
+            case '#':
+                return createBoxOnGate();
             case '&':
                 return createPad();
             case 'P':

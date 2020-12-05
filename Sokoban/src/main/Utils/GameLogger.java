@@ -46,7 +46,7 @@ public final class GameLogger extends Logger {
     private GameLogger() throws IOException {
         super("Sokoban", null);
 
-        File directory = GameFile.getFile("./logs");
+        File directory = GameIO.getFile("./logs");
         directory.mkdirs();
 
         FileHandler fileHandler = new FileHandler(directory + "/" + GameStatus.getGameStatus().getGameName() + ".log"); // variable name changed

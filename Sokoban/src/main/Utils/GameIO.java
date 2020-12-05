@@ -14,7 +14,7 @@ import java.util.List;
  * singleton class
  */
 // game file IO extracted
-public final class GameFile {
+public final class GameIO {
     /**
      * The constant fileChooser.
      */

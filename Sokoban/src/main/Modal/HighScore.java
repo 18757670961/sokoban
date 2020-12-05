@@ -1,13 +1,13 @@
 package Modal;
 
-import Utils.GameFile;
+import Utils.GameIO;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HighScore implements Serializable {
-    private static File file = GameFile.getFile("./src/main/resources/level/score.dat");
+    private static File file = GameIO.getFile("./src/main/resources/level/score.dat");
     private static Map<Integer, Integer> highScoreMap = new HashMap<>();
 
     public static void loadMap() {

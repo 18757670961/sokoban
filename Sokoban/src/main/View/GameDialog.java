@@ -68,7 +68,7 @@ public class GameDialog {
     /**
      * Show about.
      */
-    static void showAbout() {
+    public static void showAbout() {
         String title = "About this game";
         String message = "Game created by Shuguang LYU (Desmond)\n";
         GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), title, message, null);
