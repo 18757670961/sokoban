@@ -13,28 +13,28 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /**
- * singleton class
+ * GameLogger is a singleton class for logging the game running information
  */
 public final class GameLogger extends Logger {
 
     /**
-     * The constant gameLogger.
+     * all access to this class object must be through this single reference
      */
     private static GameLogger gameLogger;
     /**
-     * The constant logger.
+     * The logger.
      */
     private static final Logger logger = Logger.getLogger("GameLogger");
     /**
-     * The constant dateFormat.
+     * The dateFormat.
      */
     private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     /**
-     * The constant calendar.
+     * The calendar.
      */
     private static final Calendar calendar = Calendar.getInstance();
     /**
-     * The constant debug.
+     * if debug mode is activated
      */
     private static boolean debug = false;
 
@@ -77,7 +77,7 @@ public final class GameLogger extends Logger {
     }
 
     /**
-     * Show info.
+     * Show information message
      *
      * @param message the message
      */
@@ -86,7 +86,7 @@ public final class GameLogger extends Logger {
     }
 
     /**
-     * Show warning.
+     * Show warning message
      *
      * @param message the message
      */
@@ -95,7 +95,7 @@ public final class GameLogger extends Logger {
     }
 
     /**
-     * Show severe.
+     * Show severe message
      *
      * @param message the message
      */
@@ -104,7 +104,7 @@ public final class GameLogger extends Logger {
     }
 
     /**
-     * Is debug active boolean.
+     * Is debug activated
      *
      * @return the boolean
      */
@@ -113,18 +113,17 @@ public final class GameLogger extends Logger {
     }
 
     /**
-     * Toggle debug.
+     * Toggle debug mode
      */
     public static void toggleDebug() {
         debug = !debug;
     }
 
     /**
-     * Print state.
+     * Print state of currently played level
      *
      * @param positionInfo the position info
      */
-// method extracted
     public static void printState(PositionInfo positionInfo) {
         System.out.println("Current level state:");
         System.out.println(GameStatus.getGameStatus().getCurrentLevel().toString());

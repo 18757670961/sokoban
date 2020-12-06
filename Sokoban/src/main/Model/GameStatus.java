@@ -5,41 +5,86 @@ import Utils.FileParser;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Observable;
 
-public final class GameStatus extends Observable implements Serializable {
+/**
+ * GameStatus is a singleton class that stores all useful information of the game
+ * it is also stored into game file when saving and loading
+ */
+public final class GameStatus implements Serializable {
+
+    /**
+     * all access to this class object must be through this single reference
+     */
     private static GameStatus gameStatus;
+    /**
+     * The Game name.
+     */
     private final String GAME_NAME = "Sokoban";
+    /**
+     * The Map set name.
+     */
     private String mapSetName = "";
+    /**
+     * The total Moves count.
+     */
     private int movesCount = 0;
+    /**
+     * The Moves count for current level.
+     */
     private int movesCountLevel = 0;
+    /**
+     * The Current level.
+     */
     private Level currentLevel = null;
+    /**
+     * The Level list
+     */
     private List<Level> levels = null;
+    /**
+     * The Serializable level array for game file IO
+     * since list type cannot be serialized
+     */
     private Level[] serializableLevels = null;
+    /**
+     * if game is completed
+     */
     private boolean gameComplete = false;
-    
+
+    /**
+     * Instantiates a new Game status.
+     */
     private GameStatus() {}
 
+    /**
+     * Create game status.
+     *
+     * @param status the status read from saved file
+     */
     public static void createGameStatus(GameStatus status) {
         gameStatus = status;
     }
 
+    /**
+     * Create game status.
+     *
+     * @param input the input file stream
+     */
     public static void createGameStatus(InputStream input) {
         gameStatus = new GameStatus();
         FileParser.parseFile(input);
     }
 
     /**
-     * Gets game engine.
+     * Gets game status
      *
-     * @return the game engine
+     * @return the game status
      */
     public static GameStatus getGameStatus() {
         return gameStatus;
     }
 
     /**
-     * Is game complete boolean.
+     * Is game completed
      *
      * @return the boolean
      */
@@ -47,6 +92,9 @@ public final class GameStatus extends Observable implements Serializable {
         return gameComplete;
     }
 
+    /**
+     * Sets game to be complete.
+     */
     public void setGameComplete() {
         gameComplete = true;
     }
@@ -79,7 +127,7 @@ public final class GameStatus extends Observable implements Serializable {
     }
 
     /**
-     * Gets moves count.
+     * Gets total moves count.
      *
      * @return the moves count
      */
@@ -87,22 +135,43 @@ public final class GameStatus extends Observable implements Serializable {
         return movesCount;
     }
 
+    /**
+     * Sets total moves count.
+     *
+     * @param movesCount the moves count
+     */
     public void setMovesCount(int movesCount) {
         this.movesCount = movesCount;
     }
 
+    /**
+     * Increment total moves count.
+     */
     public void incrementMovesCount() {
         this.movesCount++;
     }
 
+    /**
+     * Gets moves count for current level.
+     *
+     * @return the moves count level
+     */
     public int getMovesCountLevel() {
         return movesCountLevel;
     }
 
+    /**
+     * Sets moves count for current level.
+     *
+     * @param movesCountLevel the moves count level
+     */
     public void setMovesCountLevel(int movesCountLevel) {
         this.movesCountLevel = movesCountLevel;
     }
 
+    /**
+     * Increment moves count for current level.
+     */
     public void incrementMovesCountLevel() {
         this.movesCountLevel++;
     }
@@ -126,43 +195,38 @@ public final class GameStatus extends Observable implements Serializable {
     }
 
     /**
-     * Gets levels.
+     * Gets level list
      *
-     * @return the levels
+     * @return the level list
      */
     public final List<Level> getLevels() {
         return levels;
     }
 
     /**
-     * Sets levels.
+     * Sets level list
      *
-     * @param newLevels the new levels
+     * @param newLevels the new level list
      */
     public void setLevels(List<Level> newLevels) {
         levels = newLevels;
     }
 
     /**
-     * Get serializable levels level [ ].
+     * Get serializable level array
      *
-     * @return the level [ ]
+     * @return the level array
      */
     public Level[] getSerializableLevels() {
         return serializableLevels;
     }
 
     /**
-     * Sets serializable levels.
+     * Sets serializable level array
      *
-     * @param levels the levels
+     * @param levels the level array
      */
     public void setSerializableLevels(Level[] levels) {
         serializableLevels = levels;
-    }
-
-    public void setUpdated(){
-        setChanged();
-        notifyObservers();
     }
 }

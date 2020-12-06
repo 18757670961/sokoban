@@ -12,11 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * FileParser is a utility class for reading and parsing map information
+ * line by line from file input stream
+ */
 public class FileParser {
+
     /**
-     * Parse file.
+     * start file parsing
      *
-     * @param input the input
+     * @param input the file input
      */
     public static void parseFile(InputStream input) {
         try {
@@ -28,18 +33,17 @@ public class FileParser {
     }
 
     /**
-     * Load game file list.
+     * prepare for file reading
      *
-     * @param input the input
+     * @param input the file input
      * @return the list
      */
-// method name changed
     public static final List<Level> prepareFileReader(InputStream input) {
         List<Level> levels = new ArrayList<>(5);
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
-            boolean parsedFirstLevel = false;
-            List<String> rawLevel = new ArrayList<>();
+            boolean parsedFirstLevel = false; // if the first level is being parsed
+            List<String> rawLevel = new ArrayList<>(); // string representation of level
             String levelName = "";
             int levelIndex = 0;
             readGameFile(new FileInfo(levels, levelIndex, reader, parsedFirstLevel, rawLevel, levelName));
@@ -57,10 +61,9 @@ public class FileParser {
     /**
      * Read game file.
      *
-     * @param fileInfo the file info
+     * @param fileInfo the information of file being read (parameter object)
      * @throws IOException the io exception
      */
-// accept parameter object fileInfo
     public static void readGameFile(FileInfo fileInfo) throws IOException {
         while (true) {
             String line = fileInfo.reader.readLine();
@@ -93,21 +96,19 @@ public class FileParser {
      *
      * @param fileInfo the file info
      */
-// method extracted
     private static void parseFinalLevel(FileInfo fileInfo) {
         if (fileInfo.rawLevel.size() != 0) {
             Level parsedLevel = new Level(fileInfo.levelName, ++fileInfo.levelIndex, fileInfo.rawLevel);
-            fileInfo.levels.add(parsedLevel);
+            fileInfo.levels.add(parsedLevel); // insert parsed level into level list
         }
     }
 
     /**
-     * Parse level.
+     * Parse level
      *
      * @param fileInfo the file info
-     * @param line     the line
+     * @param line     the line being read
      */
-// method extracted
     private static void parseLevel(FileInfo fileInfo, String line) {
         if (fileInfo.parsedFirstLevel) {
             Level parsedLevel = new Level(fileInfo.levelName, ++fileInfo.levelIndex, fileInfo.rawLevel);
@@ -121,15 +122,15 @@ public class FileParser {
     }
 
     /**
-     * The type File info.
+     * Inner class for level information passing
      */
     private static class FileInfo {
         /**
-         * The Levels.
+         * The Level list
          */
         private final List<Level> levels;
         /**
-         * The Level index.
+         * The Level index in list
          */
         private int levelIndex;
         /**
@@ -137,11 +138,11 @@ public class FileParser {
          */
         private final BufferedReader reader;
         /**
-         * The Parsed first level.
+         * if the first level is being parsed
          */
         private boolean parsedFirstLevel;
         /**
-         * The Raw level.
+         * The Raw level list
          */
         private final List<String> rawLevel;
         /**

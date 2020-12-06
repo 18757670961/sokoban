@@ -5,7 +5,6 @@ import Model.HighScore;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.effect.Effect;
-import javafx.scene.effect.MotionBlur;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -14,12 +13,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- * The type Game dialog.
+ * GameDialog is a factory class that show specific type of dialog when needed
  */
-// dialog class extracted
 public class GameDialog {
+
     /**
-     * The Dialog.
+     * The Dialog window
      */
     private final Stage dialog;
     /**
@@ -56,9 +55,7 @@ public class GameDialog {
         String dialogTitle = "Game Over !";
         String dialogMessage = "You completed " + GameStatus.getGameStatus().getMapSetName() + " in " + GameStatus.getGameStatus().getMovesCount() + " moves!\n" +
                 "High score in history: " + HighScore.getHighScore(0) + " moves";
-
-        GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), dialogTitle, dialogMessage, null);
-//        dialog.setCloseEvent();
+        GameDialog dialog = new GameDialog(WindowFactory.getPrimaryStage(), dialogTitle, dialogMessage, null);
     }
 
     /**
@@ -67,27 +64,30 @@ public class GameDialog {
     public static void showAbout() {
         String title = "Sokoban 2.0";
         String message = "Game refactored and maintained by Shuguang LYU (Desmond)\n";
-        GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), title, message, null);
+        GameDialog dialog = new GameDialog(WindowFactory.getPrimaryStage(), title, message, null);
     }
 
+    /**
+     * Show high score.
+     */
     public static void showHighScore() {
         String title = "Good Job !";
         String message = "Level completed: " + GameStatus.getGameStatus().getCurrentLevel().getName() +
                 "\n\n" + "High score: " + HighScore.getHighScore(GameStatus.getGameStatus().getCurrentLevel().getIndex()) + " moves\n\n"
                 + "Your score: " + GameStatus.getGameStatus().getMovesCountLevel() + " moves";
-        GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), title, message, null);
+        GameDialog dialog = new GameDialog(WindowFactory.getPrimaryStage(), title, message, null);
     }
 
     /**
      * Sets dialog scene.
      *
-     * @param text1 the text 1
+     * @param text the text
      */
-    private void setDialogScene(Text text1) {
+    private void setDialogScene(Text text) {
         VBox dialogVbox = new VBox(20);
         dialogVbox.setAlignment(Pos.CENTER);
         dialogVbox.setBackground(Background.EMPTY);
-        dialogVbox.getChildren().add(text1);
+        dialogVbox.getChildren().add(text);
 
         Scene dialogScene = new Scene(dialogVbox, 350, 150);
         dialog.setScene(dialogScene);
@@ -129,13 +129,4 @@ public class GameDialog {
         dialog.setTitle(dialogTitle);
         return dialog;
     }
-
-//    private void setCloseEvent() {
-//        dialog.setOnCloseRequest(new EventHandler<WindowEvent>() {
-//            @Override
-//            public void handle(WindowEvent event) {
-//                javafx.application.Platform.exit();
-//            }
-//        });
-//    }
 }

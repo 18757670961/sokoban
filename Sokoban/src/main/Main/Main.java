@@ -1,21 +1,19 @@
 package Main;
 
+import Model.HighScore;
 import Utils.GameIO;
 import Utils.GameLogger;
-import Model.HighScore;
-import View.GameWindow;
+import View.WindowFactory;
 import javafx.application.Application;
 import javafx.stage.Stage;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-/**
- * The type Main.
- */
 public class Main extends Application {
+
     @Override
     public void init() throws FileNotFoundException {
+        // preparation for game
         GameIO.loadDefaultSaveFile();
         HighScore.loadMap();
         try {
@@ -27,8 +25,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        GameWindow.setPrimaryStage(primaryStage);
-        GameWindow.createStartMenu();
+        WindowFactory.setPrimaryStage(primaryStage); // pass primary stage to window factory
+        WindowFactory.createStartMenu(); // show start page
     }
 
     @Override

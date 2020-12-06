@@ -6,8 +6,9 @@ import java.awt.*;
  * The type Position info.
  */
 public class PositionInfo {
+
     /**
-     * The Delta.
+     * The Delta of movement
      */
     private Point delta;
     /**
@@ -15,11 +16,11 @@ public class PositionInfo {
      */
     private final Point keeperPosition;
     /**
-     * The Keeper.
+     * The Keeper symbol
      */
     private final char keeper;
     /**
-     * The Keeper moved.
+     * if keeper is moved
      */
     private boolean keeperMoved;
     /**
@@ -27,19 +28,19 @@ public class PositionInfo {
      */
     private final Point targetObjectPoint;
     /**
-     * The Keeper target.
+     * The target symbol
      */
     private final char keeperTarget;
 
     /**
-     * Instantiates a new Position info.
+     * Instantiates a new Position information object
      *
-     * @param delta             the delta
-     * @param keeperPosition    the keeper position
-     * @param keeper            the keeper
-     * @param keeperMoved       the keeper moved
-     * @param targetObjectPoint the target object point
-     * @param keeperTarget      the keeper target
+     * @param delta
+     * @param keeperPosition
+     * @param keeper
+     * @param keeperMoved
+     * @param targetObjectPoint
+     * @param keeperTarget
      */
     PositionInfo(Point delta, Point keeperPosition, char keeper, boolean keeperMoved, Point targetObjectPoint, char keeperTarget) {
         this.delta = delta;
@@ -51,8 +52,6 @@ public class PositionInfo {
     }
 
     /**
-     * Gets keeper position.
-     *
      * @return the keeper position
      */
     public Point getKeeperPosition() {
@@ -60,34 +59,28 @@ public class PositionInfo {
     }
 
     /**
-     * Gets keeper.
-     *
-     * @return the keeper
+     * @return the keeper symbol
      */
     public char getKeeper() {
         return keeper;
     }
 
     /**
-     * Is keeper moved boolean.
-     *
-     * @return the boolean
+     * @return if keeper is moved
      */
     public boolean isKeeperMoved() {
         return keeperMoved;
     }
 
     /**
-     * Sets keeper moved.
-     *
-     * @param keeperMoved the keeper moved
+     * @param keeperMoved
      */
     public void setKeeperMoved(boolean keeperMoved) {
         this.keeperMoved = keeperMoved;
     }
 
     /**
-     * Gets delta.
+     * get delta of movement
      *
      * @return the delta
      */
@@ -96,7 +89,7 @@ public class PositionInfo {
     }
 
     /**
-     * Gets target object point.
+     * get target object point.
      *
      * @return the target object point
      */
@@ -105,7 +98,7 @@ public class PositionInfo {
     }
 
     /**
-     * Gets keeper target.
+     * get target of keeper
      *
      * @return the keeper target
      */
@@ -113,6 +106,12 @@ public class PositionInfo {
         return keeperTarget;
     }
 
+    /**
+     * set delta of moevement
+     *
+     * @param oldPos the old position
+     * @param newPos the new position
+     */
     public void setDelta(Point oldPos, Point newPos) {
         int x = newPos.x - oldPos.x;
         int y = newPos.y - oldPos.y;

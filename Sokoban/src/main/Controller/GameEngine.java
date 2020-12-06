@@ -1,38 +1,34 @@
 package Controller;
 
+import Model.*;
 import Utils.GameIO;
 import Utils.GameLogger;
-import Model.*;
 import View.GameDialog;
-import View.GameWindow;
-
+import View.WindowFactory;
 import java.awt.*;
 import java.io.IOException;
 
 /**
- * The type Game engine.
- */
-
-/**
- * singleton class
+ * GameEngine is a class that handles the core events in this game, such as player movement and level switching.
+ * As the main part of controller, it is responsible for the data manipulation and view update notification
  */
 public final class GameEngine {
-    private static GameStatus getStatus() {
-        return GameStatus.getGameStatus();
-    }
 
-    private static Level getCurrentLevel() {
-        return getStatus().getCurrentLevel();
-    }
-
+    /**
+     * jump to the next level
+     */
     public static void toNextLevel() {
         getStatus().setMovesCount(0);
+        getStatus().setMovesCountLevel(0);
         if (getCurrentLevel().getIndex() < getStatus().getLevels().size()) {
-            History.resetHistory();
+            History.resetHistory(); // reset current level before jump
             getStatus().setCurrentLevel(getNextLevel());
         }
     }
 
+    /**
+     * back to previous level
+     */
     public static void toPreviousLevel() {
         getStatus().setMovesCount(0);
         getStatus().setMovesCountLevel(0);
@@ -40,19 +36,23 @@ public final class GameEngine {
         History.getHistory().clear();
 
         int currentLevelIndex = getCurrentLevel().getIndex();
-        if (currentLevelIndex > 1) {
+        if (currentLevelIndex > 1) { // if previous level exceeds bound, do nothing
             getStatus().setCurrentLevel(getStatus().getLevels().get(currentLevelIndex - 2));
         }
     }
 
+    /**
+     * Handle the movemnet of player and objects
+     *
+     * @param delta the delta of movement
+     */
     public static void handleMovement(Point delta) {
         PositionInfo positionInfo = getPositionInfo(delta);
         if (positionInfo == null) {
             return;
         }
 
-        // method extracted
-        try {
+        try { // store the status into history before movement
             History.getHistory().push(getStatus().getCurrentLevel().deepClone());
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,13 +65,14 @@ public final class GameEngine {
     }
 
     /**
-     * Move.
+     * get related information of keeper and target
      *
-     * @param delta the delta
+     * @param delta the delta of movement
+     * @return the position information
      */
     private static PositionInfo getPositionInfo(Point delta) {
         if (GameStatus.getGameStatus().isGameComplete()) {
-            return null;
+            return null; // if game is completed, do nothing
         }
 
         Point keeperPosition = getCurrentLevel().getKeeperPosition();
@@ -89,14 +90,13 @@ public final class GameEngine {
     }
 
     /**
-     * Move.
+     * Move the keeper and target accordingly (in grid)
      *
-     * @param positionInfo the position info
+     * @param positionInfo the position information (parameter object)
      */
-// accept parameter object positionInfo
     private static void move(PositionInfo positionInfo) {
 
-        // switch replaced with enhanced switch
+        // decide movement according to the target type
         switch (positionInfo.getKeeperTarget()) {
 
             case '$':
@@ -105,8 +105,9 @@ public final class GameEngine {
                 break;
 
             case 'C':
+                // get the target of crate
                 char crateTarget = getCurrentLevel().getTargetObject(positionInfo.getTargetObjectPoint(), positionInfo.getDelta());
-                if (crateTarget != ' ') {
+                if (crateTarget != ' ') { // crate blocked after movement
                     break;
                 }
                 moveTargetObject(positionInfo);
@@ -118,9 +119,10 @@ public final class GameEngine {
             case 'D':
             case 'L':
             case 'R':
+                // get the position of another pipe as the exit of current entrance pipe
                 Point targetPipe = getCurrentLevel().getAnotherPipe(positionInfo.getTargetObjectPoint());
                 if (getCurrentLevel().getObjectsGrid().getGameObjectAt(targetPipe) != 'C' && targetPipe != null) {
-                    positionInfo.setDelta(positionInfo.getKeeperPosition(), targetPipe);
+                    positionInfo.setDelta(positionInfo.getKeeperPosition(), targetPipe); // the delta between keeper and exit pipe
                     moveKeeper(positionInfo);
                     positionInfo.setKeeperMoved(true);
                 }
@@ -137,6 +139,11 @@ public final class GameEngine {
         }
     }
 
+    /**
+     * Move target object.
+     *
+     * @param position the position information
+     */
     private static void moveTargetObject(PositionInfo position) {
         Point delta = position.getDelta();
         Point targetPosition = position.getTargetObjectPoint();
@@ -144,36 +151,50 @@ public final class GameEngine {
         putObject(delta, targetPosition, target);
     }
 
+    /**
+     * Move keeper.
+     *
+     * @param position the position inforamtion
+     */
     private static void moveKeeper(PositionInfo position) {
         Point delta = position.getDelta();
         Point keeperPosition = position.getKeeperPosition();
         char keeper = position.getKeeper();
         putObject(delta, keeperPosition, keeper);
-        getCurrentLevel().checkGate();
+        getCurrentLevel().checkGate(); // check the state of gate after keeper is moved
     }
 
+    /**
+     * Put object on specific location in grid
+     *
+     * @param delta    the delta
+     * @param position the position information
+     * @param object   the object being placed
+     */
     private static void putObject(Point delta, Point position, char object) {
         GameGrid objectsGrid = getCurrentLevel().getObjectsGrid();
-        Point targetPoint = GameGrid.translatePoint(position, delta);
+        Point targetPoint = GameGrid.translatePoint(position, delta); // calculate the position of target location
         objectsGrid.putGameObjectAt(objectsGrid.getGameObjectAt(targetPoint), position);
         objectsGrid.putGameObjectAt(object, targetPoint);
     }
 
     /**
-     * Check keeper position.
+     * Check game status (if current level is completed)
      *
-     * @param positionInfo the position info
+     * @param positionInfo the position information
      */
     private static void checkGameStatus(PositionInfo positionInfo) {
-        // if structure improved
         if (!positionInfo.isKeeperMoved())
             return;
 
+        // update keeper position info
         positionInfo.getKeeperPosition().translate((int) positionInfo.getDelta().getX(), (int) positionInfo.getDelta().getY());
         getStatus().incrementMovesCount();
         getStatus().incrementMovesCountLevel();
 
+        // current level completed
         if (getStatus().getCurrentLevel().isComplete()) {
+            // update high score list
             HighScore.updateMap(getCurrentLevel().getIndex(), getStatus().getMovesCountLevel());
             GameDialog.showHighScore();
 
@@ -181,20 +202,21 @@ public final class GameEngine {
                 System.out.println("Level complete!");
             }
 
-            getStatus().setCurrentLevel(getNextLevel());
+            getStatus().setCurrentLevel(getNextLevel()); // jump to next level
         }
     }
 
     /**
-     * Gets next level.
+     * retrieve next level from level list
      *
      * @return the next level
      */
     public static Level getNextLevel() {
+        // clean up move count and history
         getStatus().setMovesCountLevel(0);
         History.getHistory().clear();
 
-        if (getCurrentLevel() == null) {
+        if (getCurrentLevel() == null) { // when game start
             return getStatus().getLevels().get(0);
         }
 
@@ -203,19 +225,42 @@ public final class GameEngine {
             return getStatus().getLevels().get(currentLevelIndex);
         }
 
+        // no level left
         getStatus().setGameComplete();
         return null;
     }
 
+    /**
+     * jump to start page after game is completed
+     */
     public static void navigateToStart() {
+        // clean up and update
         HighScore.updateMap(0, GameStatus.getGameStatus().getMovesCount());
         GameDialog.showVictoryMessage();
         History.getHistory().clear();
         GameIO.loadDefaultSaveFile();
         try {
-            GameWindow.createStartMenu();
+            WindowFactory.createStartMenu();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * get game status
+     *
+     * @return the game status
+     */
+    private static GameStatus getStatus() {
+        return GameStatus.getGameStatus();
+    }
+
+    /**
+     * get current level
+     *
+     * @return the current level
+     */
+    private static Level getCurrentLevel() {
+        return getStatus().getCurrentLevel();
     }
 }

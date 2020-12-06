@@ -10,38 +10,52 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Created by Nuno on 06/02/2018.
+ * MenuWindowController is a controller class that specify event handling and data binding for start page
  */
 public class MenuWindowController implements Initializable {
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-    }
+    public void initialize(URL location, ResourceBundle resources) {}
 
+    /**
+     * Start game.
+     *
+     * @param event the event
+     */
     @FXML
     void startGame(MouseEvent event) {
         try {
-            GameWindow.createGameWindow();
+            WindowFactory.createGameWindow();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Load game.
+     *
+     * @param event the event
+     */
     @FXML
     void loadGame(MouseEvent event) {
         try {
             if (GameIO.chooseGameFile() != null) {
-                GameWindow.createGameWindow();
+                WindowFactory.createGameWindow();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Show user guide.
+     *
+     * @param event the event
+     */
     @FXML
     void showUserGuide(MouseEvent event) {
         try {
-            GameWindow.createUserGuide();
+            WindowFactory.createUserGuide();
         } catch (IOException e) {
             e.printStackTrace();
         }

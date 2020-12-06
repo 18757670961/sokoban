@@ -1,10 +1,9 @@
 package Utils;
 
-import Main.Main;
 import Model.GameStatus;
 import Model.History;
 import Model.Level;
-import View.GameWindow;
+import View.WindowFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -13,31 +12,34 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * singleton class
+ * GameIO is a singleton class responsible for game file loading and saving using serialization
  */
-// game file IO extracted
 public final class GameIO {
+
     /**
-     * The constant fileChooser.
+     * The fileChooser.
      */
     private static FileChooser fileChooser;
+    /**
+     * The url of defaultSaveFile.
+     */
     private static String defaultSaveFile = "./src/main/resources/level/sampleGame.skb";
 
     /**
-     * Load file file.
+     * create file object from uri
      *
      * @param uri the uri
      * @return the file
      */
-    public static File getFile(String uri) { return new File(uri); }
+    public static File getFile(String uri) {
+        return new File(uri);
+    }
 
     /**
      * Load default save file.
-     *
-     * @param primaryStage the primary stage
      */
-    public static void loadDefaultSaveFile()  {
-        FileInputStream inputStream = null;
+    public static void loadDefaultSaveFile() {
+        FileInputStream inputStream = null; // clear stream
         try {
             inputStream = new FileInputStream(getFile(defaultSaveFile));
         } catch (FileNotFoundException e) {
@@ -46,15 +48,20 @@ public final class GameIO {
         GameStatus.createGameStatus(inputStream);
     }
 
+    /**
+     * Choose game file to be loaded
+     *
+     * @return the object (GameStatus / FileInputStream)
+     */
     public static Object chooseGameFile() {
         try {
             Object fileInput;
-            fileInput = loadGameFile(GameWindow.getPrimaryStage());
+            fileInput = loadGameFile(WindowFactory.getPrimaryStage());
 
             if (fileInput != null) {
-                if (fileInput instanceof GameStatus) {
+                if (fileInput instanceof GameStatus) { // load from binary game save file (serialized)
                     GameStatus.createGameStatus((GameStatus) fileInput);
-                } else {
+                } else { // load from textual map data file
                     GameStatus.createGameStatus((FileInputStream) fileInput);
                 }
                 History.getHistory().clear();
@@ -69,9 +76,11 @@ public final class GameIO {
     }
 
     /**
-     * Create file chooser.
+     * factory method for creating file chooser.
+     *
+     * @param title the file title
+     * @param type  the type (0 for saving file, 1 for loading file)
      */
-// factory method
     public static void createFileChooser(String title, int type) {
         fileChooser = new FileChooser();
         fileChooser.setTitle(title);
@@ -99,20 +108,17 @@ public final class GameIO {
                 GameLogger.showInfo("Saving file: " + file.getName());
             }
 
-            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file)))
-            {
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
                 // serialize gameStatus
                 serialize(out);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
     /**
-     * Serialize.
+     * Serialize GameStatus object
      *
      * @param out the out
      * @throws IOException the io exception
@@ -144,21 +150,16 @@ public final class GameIO {
             }
 
             String fileExtension = file.getName().substring(file.getName().lastIndexOf("."));
-            if (fileExtension.equals(".dat")) {
-                try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file)))
-                {
+            if (fileExtension.equals(".dat")) { // binary file
+                try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
                     // deserialize gameStatus
                     return deserialize(in);
-                }
-                catch (IOException e)
-                {
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-                catch (ClassNotFoundException e)
-                {
-                    e.printStackTrace();
-                }
-            } else {
+            } else { // text file
                 return new FileInputStream(file);
             }
         }
@@ -167,7 +168,7 @@ public final class GameIO {
     }
 
     /**
-     * Deserialize game engine.
+     * Deserialize GameStatus object
      *
      * @param in the in
      * @return the game engine

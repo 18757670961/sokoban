@@ -12,43 +12,55 @@ import java.io.IOException;
 import java.net.URL;
 
 /**
- * The type Game window.
+ * WindowFactory is a factory class for create specific type of window
  */
-// GUI class extracted
-public class GameWindow {
+public class WindowFactory {
+
     /**
      * The Primary stage.
      */
     private static Stage primaryStage;
 
+    /**
+     * Create start menu.
+     *
+     * @throws IOException the io exception
+     */
     public static void createStartMenu() throws IOException {
         Parent parent = FXMLLoader.load(new URL("file:src/main/View/MenuWindow.fxml"));
         Scene scene = new Scene(parent);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Sokoban");
-//        primaryStage.initModality(Modality.APPLICATION_MODAL);
         primaryStage.setResizable(false);
         primaryStage.getIcons().add(new Image("file:src/main/resources/image/box.png"));
         primaryStage.show();
         primaryStage.setOnCloseRequest(event -> System.exit(0));
     }
 
-
+    /**
+     * Create game window.
+     *
+     * @throws IOException the io exception
+     */
     public static void createGameWindow() throws IOException {
         Parent parent = FXMLLoader.load(new URL("file:src/main/View/GameWindow.fxml"));
         Scene scene = new Scene(parent);
         primaryStage.setTitle(GameStatus.getGameStatus().getGameName());
         primaryStage.setScene(scene);
-//        primaryStage.setScene(new Scene(root));
+        primaryStage.centerOnScreen();
+        primaryStage.getIcons().add(new Image("file:src/main/resources/image/box.png"));
+        //        primaryStage.setScene(new Scene(root));
 //        primaryStage.setResizable(false);
 //        primaryStage.setFullScreen(true);
 //        primaryStage.setWidth(1920);
 //        primaryStage.setHeight(1080);
-        primaryStage.centerOnScreen();
-        //primaryStage.initModality(Modality.APPLICATION_MODAL);
-        primaryStage.getIcons().add(new Image("file:src/main/resources/image/box.png"));
     }
 
+    /**
+     * Create user guide page
+     *
+     * @throws IOException the io exception
+     */
     public static void createUserGuide() throws IOException {
         Stage stage = new Stage();
         Parent parent = FXMLLoader.load(new URL("file:src/main/View/UserGuide.fxml"));
@@ -60,9 +72,20 @@ public class GameWindow {
         stage.show();
     }
 
+    /**
+     * Gets primary stage.
+     *
+     * @return the primary stage
+     */
     public static Stage getPrimaryStage() {
         return primaryStage;
     }
+
+    /**
+     * Sets primary stage.
+     *
+     * @param stage the stage
+     */
     public static void setPrimaryStage(Stage stage) {
         primaryStage = stage;
     }

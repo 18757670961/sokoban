@@ -8,29 +8,37 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * The type Level.
+ * Level is a class that stores the realted information for specific level
+ * and deals with low-level grid manipulation, object relocation and map parsing
  */
 public final class Level implements Iterable<Character>, Serializable {
+
     /**
      * The Objects grid.
      */
     public final GameGrid objectsGrid;
     /**
-     * The Diamonds grid.
+     * The Diamonds grid (for checking if any object is on diamond / pressure pad)
      */
     public final GameGrid diamondsGrid;
     /**
      * The Keeper position.
      */
     private Point keeperPosition;
+    /**
+     * The Gate position.
+     */
     private Point gatePosition;
+    /**
+     * The Pressure Pad position.
+     */
     private Point padPosition;
     /**
-     * The Name.
+     * The Level Name.
      */
     private final String name;
     /**
-     * The Index.
+     * The Index of level in level list
      */
     private final int index;
     /**
@@ -43,7 +51,7 @@ public final class Level implements Iterable<Character>, Serializable {
      *
      * @param levelName  the level name
      * @param levelIndex the level index
-     * @param rawLevel   the raw level
+     * @param rawLevel   the raw level (pure string representation)
      */
     public Level(String levelName, int levelIndex, List<String> rawLevel) {
         if (GameLogger.isDebugActive()) {
@@ -58,21 +66,19 @@ public final class Level implements Iterable<Character>, Serializable {
 
         int rows = rawLevel.size();
         int columns = rawLevel.get(0).trim().length();
-
         objectsGrid = createGrid(rows, columns);
         diamondsGrid = createGrid(rows, columns);
 
-        parseRawLevel(rawLevel); // method extracted
+        parseRawLevel(rawLevel);
     }
 
     /**
-     * Create grid game grid.
+     * factory method for creating game grid.
      *
-     * @param rows    the rows
-     * @param columns the columns
+     * @param rows    the row number
+     * @param columns the column number
      * @return the game grid
      */
-// factory method
     private GameGrid createGrid(int rows, int columns) {
         final GameGrid objectsGrid;
         objectsGrid = new GameGrid(rows, columns);
@@ -80,7 +86,7 @@ public final class Level implements Iterable<Character>, Serializable {
     }
 
     /**
-     * Parse raw level.
+     * Parse raw level into grid
      *
      * @param rawLevel the raw level
      */
@@ -89,19 +95,19 @@ public final class Level implements Iterable<Character>, Serializable {
             for (int col = 0; col < rawLevel.get(row).length(); col++) {
                 char curTile = rawLevel.get(row).charAt(col);
 
-                if (curTile == 'G') {
+                if (curTile == 'G') { // diamond (destination)
                     numberOfDiamonds++;
                     diamondsGrid.putGameObjectAt(curTile, row, col);
                     curTile = ' ';
-                } else if (curTile == 'S') {
+                } else if (curTile == 'S') { // keeper
                     keeperPosition = new Point(row, col);
-                } else if (curTile == '&') {
+                } else if (curTile == '&') { // pressure pad
                     padPosition = new Point(row, col);
                     diamondsGrid.putGameObjectAt(curTile, row, col);
                     curTile = ' ';
-                } else if (curTile == '$') {
+                } else if (curTile == '$') { // gate
                     gatePosition = new Point(row, col);
-                } else if (curTile == 'O') {
+                } else if (curTile == 'O') { // crate on diamond
                     numberOfDiamonds++;
                     diamondsGrid.putGameObjectAt('G', row, col);
                     curTile = 'C';
@@ -112,44 +118,54 @@ public final class Level implements Iterable<Character>, Serializable {
         }
     }
 
+    /**
+     * Deep clone level for history storage (avoid problems caused by reference when copying)
+     * serialize level object first and then deserialize back
+     *
+     * @return the level
+     * @throws IOException            the io exception
+     * @throws ClassNotFoundException the class not found exception
+     */
     public Level deepClone() throws IOException, ClassNotFoundException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-        objectOutputStream.writeObject(this);
+        objectOutputStream.writeObject(this); // serialize
         ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-        return (Level) objectInputStream.readObject();
+        return (Level) objectInputStream.readObject(); // deserialize
     }
 
+    /**
+     * Check and set the state of gate
+     */
     public void checkGate() {
-        if (gatePosition.x == 0 && gatePosition.y == 0) {
+        if (gatePosition.x == 0 && gatePosition.y == 0) { // no gate
             return;
         }
-        if (objectsGrid.getGameObjectAt(padPosition) == ' ') {
-            if (objectsGrid.getGameObjectAt(gatePosition) == 'C') {
+        if (objectsGrid.getGameObjectAt(padPosition) == ' ') { // pressure pad nonactivated
+            if (objectsGrid.getGameObjectAt(gatePosition) == 'C') { // crate on gate
                 objectsGrid.putGameObjectAt('#', gatePosition);
             } else if (objectsGrid.getGameObjectAt(gatePosition) != '#') {
                 objectsGrid.putGameObjectAt('$', gatePosition);
             }
-        } else {
-            if (objectsGrid.getGameObjectAt(gatePosition) == '$') {
+        } else { // pressure pad activated
+            if (objectsGrid.getGameObjectAt(gatePosition) == '$') { // open gate
                 objectsGrid.putGameObjectAt(' ', gatePosition);
-            } else if (objectsGrid.getGameObjectAt(gatePosition) == '#') {
+            } else if (objectsGrid.getGameObjectAt(gatePosition) == '#') { // release crate on gate
                 objectsGrid.putGameObjectAt('C', gatePosition);
             }
         }
     }
 
     /**
-     * Is complete boolean.
+     * Is level completed
      *
      * @return the boolean
      */
     public boolean isComplete() {
-        int cratedDiamondsCount = 0;
+        int cratedDiamondsCount = 0; // number of crate on diamond
         for (int row = 0; row < objectsGrid.ROWS; row++) {
             for (int col = 0; col < objectsGrid.COLUMNS; col++) {
-                // if condition simplified
                 if (getObject(row, col) == 'C' && getDiamond(row, col) == 'G') {
                     cratedDiamondsCount++;
                 }
@@ -159,26 +175,16 @@ public final class Level implements Iterable<Character>, Serializable {
     }
 
     /**
-     * Gets target object.
-     *
-     * @param source the source
-     * @param delta  the delta
-     * @return the target object
-     */
-    public char getTargetObject(Point source, Point delta) {
-        return objectsGrid.getTargetFromSource(source, delta);
-    }
-
-    /**
      * scan the map for another pipe as exit point
-     * @param currentPipe
-     * @return
+     *
+     * @param currentPipe the current pipe
+     * @return another pipe
      */
     public Point getAnotherPipe(Point currentPipe) {
         for (int row = 0; row < objectsGrid.ROWS; row++) {
             for (int col = 0; col < objectsGrid.COLUMNS; col++) {
                 if (row == currentPipe.y && col == currentPipe.x) {
-                    continue;
+                    continue; // skip entrance pipe
                 }
                 char object = getObject(row, col);
                 switch (object) {
@@ -196,45 +202,61 @@ public final class Level implements Iterable<Character>, Serializable {
         return null;
     }
 
+    /**
+     * Gets target object symbol
+     *
+     * @param source the source point
+     * @param delta  the delta
+     * @return the target object
+     */
+    public char getTargetObject(Point source, Point delta) {
+        return objectsGrid.getTargetFromSource(source, delta);
+    }
+
+    /**
+     * Gets objects grid.
+     *
+     * @return the objects grid
+     */
     public GameGrid getObjectsGrid() {
         return objectsGrid;
     }
 
     /**
-     * Gets diamond.
+     * Gets diamond at specific coordinate
      *
-     * @param row the row
-     * @param col the col
-     * @return the diamond
+     * @param row the row index
+     * @param col the col index
+     * @return the diamond symbol
      */
     private char getDiamond(int row, int col) {
         return diamondsGrid.getGameObjectAt(col, row);
     }
 
     /**
-     * Gets object.
+     * Gets object at specific coordinate
      *
-     * @param row the row
-     * @param col the col
-     * @return the object
+     * @param row the row index
+     * @param col the col index
+     * @return the object symbol
      */
     private char getObject(int row, int col) {
         return objectsGrid.getGameObjectAt(col, row);
     }
 
     /**
-     * Gets name.
+     * Gets level name.
      *
-     * @return the name
+     * @return the level name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Gets index.
+     * Gets level index.
      *
-     * @return the index
+     * @return the level index
      */
     public int getIndex() {
         return index;
@@ -249,6 +271,11 @@ public final class Level implements Iterable<Character>, Serializable {
         return keeperPosition;
     }
 
+    /**
+     * Gets gate position.
+     *
+     * @return the gate position
+     */
     public Point getGatePosition() {
         return gatePosition;
     }
@@ -264,16 +291,16 @@ public final class Level implements Iterable<Character>, Serializable {
     }
 
     /**
-     * The type Level iterator.
+     * The iterator of level
      */
     public class LevelIterator implements Iterator<Character> {
 
         /**
-         * The Column.
+         * The Column index
          */
         int column = 0;
         /**
-         * The Row.
+         * The Row index
          */
         int row = 0;
 
@@ -284,7 +311,7 @@ public final class Level implements Iterable<Character>, Serializable {
 
         @Override
         public Character next() {
-            if (column >= objectsGrid.COLUMNS) {
+            if (column >= objectsGrid.COLUMNS) { // boundary check
                 column = 0;
                 row++;
             }
@@ -293,21 +320,20 @@ public final class Level implements Iterable<Character>, Serializable {
             char retObj = object;
             column++;
 
-            // if structure improved
             if (diamond == 'G') {
-                if (object == 'C') {
+                if (object == 'C') { // crate on diamond
                     retObj = 'O';
                 }
-                if (object == ' ') {
+                if (object == ' ') { // nothing on diamond
                     retObj = diamond;
                 }
             }
 
             if (diamond == '&') {
-                if (object == 'C') {
+                if (object == 'C') { // crate locked on gate
                     retObj = 'P';
                 }
-                if (object == ' ') {
+                if (object == ' ') { // noting on gate
                     retObj = diamond;
                 }
             }

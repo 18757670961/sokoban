@@ -7,42 +7,40 @@ import java.io.Serializable;
 import java.util.Iterator;
 
 /**
- * The type Game grid.
+ * GameGrid is a class that stores the position information of all objects in the map
  */
 public class GameGrid implements Iterable, Serializable {
+
     /**
-     * The Columns.
+     * column number
      */
     final int COLUMNS;
     /**
-     * The Rows.
+     * row number
      */
     final int ROWS;
     /**
-     * The Game objects.
+     * 2D array of objects
      */
     private final char[][] gameObjects;
 
     /**
      * Instantiates a new Game grid.
      *
-     * @param columns the columns
-     * @param rows    the rows
+     * @param columns column number
+     * @param rows    row number
      */
     public GameGrid(int columns, int rows) {
         COLUMNS = columns;
         ROWS = rows;
-
-        // Initialize the array
-        gameObjects = createGrid();
+        gameObjects = createGrid(); // Initialize the array
     }
 
     /**
-     * Create grid game object [ ] [ ].
+     * factory method for creating grid
      *
-     * @return the game object [ ] [ ]
+     * @return game object grid [ ] [ ]
      */
-// factory method
     private char[][] createGrid() {
         final char[][] gameObjects;
         gameObjects = new char[COLUMNS][ROWS];
@@ -50,16 +48,27 @@ public class GameGrid implements Iterable, Serializable {
     }
 
     /**
-     * Translate point point.
+     * calculate target position from given delta
      *
      * @param sourceLocation the source location
      * @param delta          the delta
-     * @return the point
+     * @return the target position
      */
     public static Point translatePoint(Point sourceLocation, Point delta) {
         Point translatedPoint = new Point(sourceLocation);
         translatedPoint.translate((int) delta.getX(), (int) delta.getY());
         return translatedPoint;
+    }
+
+    /**
+     * Gets target symbol after target point is calculated
+     *
+     * @param source the source
+     * @param delta  the delta
+     * @return the target from source
+     */
+    public char getTargetFromSource(Point source, Point delta) {
+        return getGameObjectAt(translatePoint(source, delta));
     }
 
     /**
@@ -72,26 +81,14 @@ public class GameGrid implements Iterable, Serializable {
     }
 
     /**
-     * Gets target from source.
+     * Gets game object from coordinate
      *
-     * @param source the source
-     * @param delta  the delta
-     * @return the target from source
-     */
-    public char getTargetFromSource(Point source, Point delta) {
-        return getGameObjectAt(translatePoint(source, delta));
-    }
-
-    /**
-     * Gets game object at.
-     *
-     * @param col the col
-     * @param row the row
-     * @return the game object at
+     * @param col the column index
+     * @param row the row index
+     * @return the game object symbol
      * @throws ArrayIndexOutOfBoundsException the array index out of bounds exception
      */
     public char getGameObjectAt(int col, int row) throws ArrayIndexOutOfBoundsException {
-        // if structure improved
         if (!isPointOutOfBounds(col, row)) {
             return gameObjects[col][row];
         }
@@ -104,7 +101,7 @@ public class GameGrid implements Iterable, Serializable {
     }
 
     /**
-     * Gets game object at.
+     * Gets game object from point
      *
      * @param point the point
      * @return the game object at
@@ -118,16 +115,12 @@ public class GameGrid implements Iterable, Serializable {
         return getGameObjectAt((int) point.getX(), (int) point.getY());
     }
 
-//    public boolean removeGameObjectAt(Point position) {
-//        return putGameObjectAt(null, position);
-//    }
-
     /**
-     * Put game object at boolean.
+     * Put game object at some coordinate
      *
      * @param gameObject the game object
-     * @param x          the x
-     * @param y          the y
+     * @param x
+     * @param y
      * @return the boolean
      */
     public boolean putGameObjectAt(char gameObject, int x, int y) {
@@ -139,7 +132,7 @@ public class GameGrid implements Iterable, Serializable {
     }
 
     /**
-     * Put game object at boolean.
+     * Put game object at some point
      *
      * @param gameObject the game object
      * @param point      the point
@@ -150,10 +143,10 @@ public class GameGrid implements Iterable, Serializable {
     }
 
     /**
-     * Is point out of bounds boolean.
+     * check if point is out of bounds
      *
-     * @param x the x
-     * @param y the y
+     * @param x
+     * @param y
      * @return the boolean
      */
     private boolean isPointOutOfBounds(int x, int y) {
@@ -161,9 +154,9 @@ public class GameGrid implements Iterable, Serializable {
     }
 
     /**
-     * Is point out of bounds boolean.
+     * check if point is out of bounds
      *
-     * @param p the p
+     * @param p the point
      * @return the boolean
      */
     private boolean isPointOutOfBounds(Point p) {
@@ -176,12 +169,8 @@ public class GameGrid implements Iterable, Serializable {
 
         for (char[] gameObject : gameObjects) {
             for (char aGameObject : gameObject) {
-//                if (aGameObject == 'x') {
-//                    aGameObject = '=';
-//                }
                 stringBuilder.append(aGameObject);
             }
-
             stringBuilder.append('\n');
         }
 
@@ -194,15 +183,15 @@ public class GameGrid implements Iterable, Serializable {
     }
 
     /**
-     * The type Grid iterator.
+     * The iterator of grid
      */
     public class GridIterator implements Iterator<Character> {
         /**
-         * The Row.
+         * The Row index
          */
         int row = 0;
         /**
-         * The Column.
+         * The Column index
          */
         int column = 0;
 
