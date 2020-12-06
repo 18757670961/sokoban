@@ -2,18 +2,13 @@ package Main;
 
 import Utils.GameIO;
 import Utils.GameLogger;
-import Modal.HighScore;
+import Model.HighScore;
 import View.GameWindow;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * The type Main.

@@ -1,7 +1,7 @@
 package Utils;
 
 import Controller.PositionInfo;
-import Modal.GameStatus;
+import Model.GameStatus;
 
 import java.io.File;
 import java.io.IOException;

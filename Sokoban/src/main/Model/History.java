@@ -1,8 +1,5 @@
-package Modal;
+package Model;
 
-import Controller.GameEngine;
-
-import java.util.ArrayList;
 import java.util.Stack;
 
 /**

@@ -1,9 +1,7 @@
 package View;
 
-import Controller.GameEngine;
-import Modal.GameStatus;
-import Modal.HighScore;
-import javafx.event.EventHandler;
+import Model.GameStatus;
+import Model.HighScore;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.effect.Effect;
@@ -14,7 +12,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 /**
  * The type Game dialog.
@@ -59,9 +56,8 @@ public class GameDialog {
         String dialogTitle = "Game Over !";
         String dialogMessage = "You completed " + GameStatus.getGameStatus().getMapSetName() + " in " + GameStatus.getGameStatus().getMovesCount() + " moves!\n" +
                 "High score in history: " + HighScore.getHighScore(0) + " moves";
-        MotionBlur motionBlur = new MotionBlur(2, 3); // vairable name changed
 
-        GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), dialogTitle, dialogMessage, motionBlur);
+        GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), dialogTitle, dialogMessage, null);
 //        dialog.setCloseEvent();
     }
 
@@ -69,8 +65,8 @@ public class GameDialog {
      * Show about.
      */
     public static void showAbout() {
-        String title = "About this game";
-        String message = "Game created by Shuguang LYU (Desmond)\n";
+        String title = "Sokoban 2.0";
+        String message = "Game refactored and maintained by Shuguang LYU (Desmond)\n";
         GameDialog dialog = new GameDialog(GameWindow.getPrimaryStage(), title, message, null);
     }
 
@@ -109,6 +105,7 @@ public class GameDialog {
         Text text1 = new Text(dialogMessage);
         text1.setTextAlignment(TextAlignment.CENTER);
         text1.setFont(javafx.scene.text.Font.font(14));
+        text1.setWrappingWidth(300);
 
         if (dialogMessageEffect != null) {
             text1.setEffect(dialogMessageEffect);

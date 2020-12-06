@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -43,13 +44,13 @@
           </Menu>
             <Menu mnemonicParsing="false" text="Settings">
               <items>
-                <MenuItem mnemonicParsing="false" onAction="#toggleMusic" text="Toggle Music" />
-                  <MenuItem mnemonicParsing="false" onAction="#toggleDebug" text="Toggle Debug" />
+                  <RadioMenuItem mnemonicParsing="false" onAction="#toggleMusic" text="Toggle Music" />
+                  <RadioMenuItem mnemonicParsing="false" onAction="#toggleDebug" text="Toggle Debug" />
               </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Help">
               <items>
-                <MenuItem mnemonicParsing="false" text="Sokoban Help" />
+                <MenuItem mnemonicParsing="false" onAction="#showHelp" text="Sokoban Help" />
                   <MenuItem mnemonicParsing="false" onAction="#showAbout" text="About" />
               </items>
             </Menu>
@@ -71,40 +72,58 @@
             </BorderPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="1000.0" prefWidth="400.0" style="-fx-background-color: #f8f8e0;">
                <children>
-                  <ImageView fitHeight="386.0" fitWidth="400.0" layoutX="18.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="386.0" fitWidth="400.0" layoutX="18.0" layoutY="33.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../resources/image/frame.png" />
                      </image>
                   </ImageView>
-                  <TableView layoutY="406.0" prefHeight="593.0" prefWidth="422.0" style="-fx-background-color: #f8f8e0;">
+                  <TableView fx:id="cheatSheet" focusTraversable="false" layoutY="460.0" pickOnBounds="false" prefHeight="539.0" prefWidth="422.0" style="-fx-background-color: #f8f8e0;">
                     <columns>
-                      <TableColumn prefWidth="204.0000044107437" text="Key" />
-                      <TableColumn prefWidth="218.2857666015625" text="Function" />
+                      <TableColumn fx:id="keyCol" editable="false" prefWidth="204.0000044107437" sortable="false" text="Key" />
+                      <TableColumn fx:id="functionCol" editable="false" prefWidth="218.2857666015625" sortable="false" text="Function" />
                     </columns>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
                   </TableView>
-                  <Label layoutX="86.0" layoutY="167.0" lineSpacing="1.0" prefHeight="25.0" prefWidth="255.0" text="Map Set Name : " textFill="#1bda41" textOverrun="CLIP" wrapText="true">
+                  <Label layoutX="83.0" layoutY="209.0" lineSpacing="1.0" prefHeight="33.0" prefWidth="115.0" text="Map Set Name : " textFill="#1bda41" textOverrun="CLIP" wrapText="true">
                      <font>
-                        <Font size="18.0" />
+                        <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="86.0" layoutY="193.0" prefHeight="33.0" prefWidth="255.0" text="Level Name : " textFill="#1bda41">
+                  <Label layoutX="83.0" layoutY="238.0" prefHeight="33.0" prefWidth="97.0" text="Level Name : " textFill="#1bda41">
                      <font>
-                        <Font size="18.0" />
+                        <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="86.0" layoutY="226.0" prefHeight="33.0" prefWidth="255.0" text="Moves Count (level) : " textFill="#1bda41">
+                  <Label layoutX="83.0" layoutY="271.0" prefHeight="33.0" prefWidth="147.0" text="Moves Count (level) : " textFill="#1bda41">
                      <font>
-                        <Font size="18.0" />
+                        <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="86.0" layoutY="259.0" prefHeight="33.0" prefWidth="255.0" text="Moves Count (total) : " textFill="#1bda41">
+                  <Label layoutX="83.0" layoutY="304.0" prefHeight="33.0" prefWidth="147.0" text="Moves Count (total) : " textFill="#1bda41">
                      <font>
-                        <Font size="18.0" />
+                        <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="86.0" layoutY="292.0" prefHeight="33.0" prefWidth="255.0" text="High Score :" textFill="#1bda41">
+                  <Label fx:id="mapSetName" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="201.0" layoutY="216.0" prefHeight="20.0" prefWidth="136.0" textAlignment="RIGHT" textFill="WHITE">
                      <font>
-                        <Font size="18.0" />
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="levelName" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="190.0" layoutY="245.0" prefHeight="20.0" prefWidth="147.0" textAlignment="RIGHT" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="moveCountLevel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="231.0" layoutY="278.0" prefHeight="20.0" prefWidth="106.0" textAlignment="RIGHT" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="moveCountTotal" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="231.0" layoutY="311.0" prefHeight="20.0" prefWidth="106.0" textAlignment="RIGHT" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
                      </font>
                   </Label>
                </children></AnchorPane>

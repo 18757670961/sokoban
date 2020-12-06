@@ -1,11 +1,9 @@
 package Controller;
 
-import Modal.Level;
-import Utils.GameIO;
+import Model.Level;
 import Utils.GameLogger;
-import Modal.GameStatus;
-import Modal.History;
-import View.GameWindow;
+import Model.GameStatus;
+import Model.History;
 import javafx.scene.input.KeyCode;
 
 import java.awt.*;

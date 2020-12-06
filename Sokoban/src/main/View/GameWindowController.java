@@ -2,14 +2,21 @@ package View;
 
 import Controller.GameEngine;
 import Controller.KeyHandler;
-import Modal.GameStatus;
-import Modal.History;
-import Modal.Level;
+import Model.GameStatus;
+import Model.History;
+import Model.Level;
+import Utils.CheatSheet;
 import Utils.GameIO;
 import Utils.GameLogger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -25,15 +32,31 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class GameWindowController implements Initializable {
-    private Stage primaryStage = GameWindow.getPrimaryStage();
-    private static MediaPlayer mediaPlayer = new MediaPlayer(new Media(GameIO.getFile("src/main/resources/music/bgm.wav").toURI().toString()));
     @FXML private GridPane gameGrid;
-    @FXML private MenuItem menuAbout;
+    @FXML private Label mapSetName;
+    @FXML private Label levelName;
+    @FXML private Label moveCountLevel;
+    @FXML private Label moveCountTotal;
+    @FXML private TableView<CheatSheet> cheatSheet;
+    @FXML private TableColumn<CheatSheet, String> keyCol;
+    @FXML private TableColumn<CheatSheet, String> functionCol;
+
+    private Stage primaryStage = GameWindow.getPrimaryStage();
+    private MediaPlayer mediaPlayer = new MediaPlayer(new Media(GameIO.getFile("src/main/resources/music/bgm.wav").toURI().toString()));
+    private final ObservableList<CheatSheet> keyInfo = FXCollections.observableArrayList (
+            new CheatSheet("W / UP", "move upwards"),
+            new CheatSheet("S / DOWN", "move downwards"),
+            new CheatSheet("A / LEFT", "move leftwards"),
+            new CheatSheet("D / RIGHT", "move rightwards"),
+            new CheatSheet("Q", "undo"),
+            new CheatSheet("E", "reset"),
+            new CheatSheet("Z", "previous level"),
+            new CheatSheet("X", "next level")
+    );
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        reloadGrid();
-
+        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             try {
                 Level level = KeyHandler.handleKey(event.getCode());
@@ -46,6 +69,11 @@ public class GameWindowController implements Initializable {
                 e.printStackTrace();
             }
         });
+
+        keyCol.setCellValueFactory(new PropertyValueFactory<CheatSheet, String>("key"));
+        functionCol.setCellValueFactory(new PropertyValueFactory<CheatSheet, String>("function"));
+        cheatSheet.setItems(keyInfo);
+        reloadGrid();
     }
     
     private GameStatus getGameStatus() {
@@ -69,6 +97,7 @@ public class GameWindowController implements Initializable {
         Level.LevelIterator oldLevelGridIterator = (Level.LevelIterator) previousLevel.iterator();
         addPartialObjects(newLevelGridIterator, oldLevelGridIterator);
 
+        updateInfoBox();
         resizeWindow();
     }
 
@@ -101,6 +130,7 @@ public class GameWindowController implements Initializable {
             addObjectToGrid(newObject, newObjectPosition);
         }
 
+        updateInfoBox();
         resizeWindow();
     }
 
@@ -119,9 +149,26 @@ public class GameWindowController implements Initializable {
         }
     }
 
+    private void updateInfoBox() {
+        mapSetName.setText(getGameStatus().getMapSetName());
+        levelName.setText(getGameStatus().getCurrentLevel().getName());
+        moveCountLevel.setText(getGameStatus().getMovesCountLevel() + "");
+        moveCountTotal.setText(getGameStatus().getMovesCount() + "");
+    }
+
     @FXML
     void showAbout(ActionEvent event) {
         GameDialog.showAbout();
+    }
+
+
+    @FXML
+    void showHelp(ActionEvent event) {
+        try {
+            GameWindow.createUserGuide();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -151,11 +198,13 @@ public class GameWindowController implements Initializable {
     @FXML
     void toPreviousLevel(ActionEvent event) {
         GameEngine.toPreviousLevel();
+        reloadGrid();
     }
 
     @FXML
     void toNextLevel(ActionEvent event) {
         GameEngine.toNextLevel();
+        reloadGrid();
     }
 
     @FXML
@@ -165,22 +214,8 @@ public class GameWindowController implements Initializable {
 
     @FXML
     void loadGame(ActionEvent event) {
-        try {
-            Object fileInput;
-            fileInput = GameIO.loadGameFile(primaryStage);
-
-            if (fileInput != null) {
-                if (fileInput instanceof GameStatus) {
-                    GameStatus.createGameStatus((GameStatus) fileInput);
-                } else {
-                    GameStatus.createGameStatus((FileInputStream) fileInput);
-                }
-                History.getHistory().clear();
-                System.out.println(getGameStatus().getCurrentLevel());
-                reloadGrid();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        if (GameIO.chooseGameFile() != null) {
+            reloadGrid();
         }
     }
 

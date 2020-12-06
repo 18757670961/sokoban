@@ -1,10 +1,10 @@
-package Modal;
+package Model;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class GameObjectTest {
+class LevelTest {
 
     @BeforeEach
     void setUp() {
@@ -15,22 +15,30 @@ class GameObjectTest {
     }
 
     @Test
-    void toGameObject() {
+    void isComplete() {
     }
 
     @Test
-    void getStringSymbol() {
+    void getName() {
     }
 
     @Test
-    void getCharSymbol() {
+    void getIndex() {
     }
 
     @Test
-    void values() {
+    void getKeeperPosition() {
     }
 
     @Test
-    void valueOf() {
+    void getTargetObject() {
+    }
+
+    @Test
+    void testToString() {
+    }
+
+    @Test
+    void iterator() {
     }
 }

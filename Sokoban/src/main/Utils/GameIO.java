@@ -1,8 +1,10 @@
 package Utils;
 
-import Utils.GameLogger;
-import Modal.GameStatus;
-import Modal.Level;
+import Main.Main;
+import Model.GameStatus;
+import Model.History;
+import Model.Level;
+import View.GameWindow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -42,6 +44,28 @@ public final class GameIO {
             e.printStackTrace();
         }
         GameStatus.createGameStatus(inputStream);
+    }
+
+    public static Object chooseGameFile() {
+        try {
+            Object fileInput;
+            fileInput = loadGameFile(GameWindow.getPrimaryStage());
+
+            if (fileInput != null) {
+                if (fileInput instanceof GameStatus) {
+                    GameStatus.createGameStatus((GameStatus) fileInput);
+                } else {
+                    GameStatus.createGameStatus((FileInputStream) fileInput);
+                }
+                History.getHistory().clear();
+                System.out.println(GameStatus.getGameStatus().getCurrentLevel());
+            }
+
+            return fileInput;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

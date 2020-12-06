@@ -2,14 +2,11 @@ package Controller;
 
 import Utils.GameIO;
 import Utils.GameLogger;
-import Modal.*;
+import Model.*;
 import View.GameDialog;
 import View.GameWindow;
-import javafx.stage.Stage;
 
 import java.awt.*;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**

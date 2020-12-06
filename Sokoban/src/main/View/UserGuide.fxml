@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pannable="true" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1">
+  <content>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="930.0" prefWidth="600.0">
+         <children>
+            <Label layoutX="14.0" layoutY="24.0" text="The Sokoban Game">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label alignment="TOP_LEFT" layoutX="14.0" layoutY="57.0" lineSpacing="1.0" prefHeight="173.0" prefWidth="560.0" text="Sokoban is a classic puzzle game invented in Japan. The original game of SOKOBAN was written by Hiroyuki Imabayashi. Today Sokoban is one of the most popular thought and logic games. The name comes from Japan and means &quot;warehouse keeper&quot;. As simple as that name is, so is the idea of this game: A level represents a store room, where boxes appear to be randomly placed. You help the warehouse keeper to push the boxes around the maze of the room so that, in the end, all boxes are on marked fields. The only restrictions are that the warehouse keeper can only push a box, never pull, and that just one box may be pushed at a time. Each level has a different structure, which requires a different solution - often with a different strategy as well. The magic of the game is that boxes, which are out of the way on one move, might be in the way on the next move. The simplicity of the rules, in combination with the many levels ranging from easy to extremely difficult, have made Sokoban become a real classic." wrapText="true" />
+            <Label layoutX="14.0" layoutY="247.0" text="Rules of the Game">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label alignment="TOP_LEFT" layoutX="14.0" layoutY="281.0" lineSpacing="1.0" prefHeight="173.0" prefWidth="560.0" text="The game consists of a warehouse made up of walls that form passages. Within the warehouse are the pusher and an equal number of boxes and storage locations. The pusher can only push a box, never pull, and only one box can be pushed at a time. The goal is to push all the boxes into the storage locations. These rules present a variety of challenges. Since the pusher can't pull a box, there are some pushes that are irreversible. A box is stuck when pushed into a corner or against a wall that it can't be pushed out of or away from. In real life a warehouse keeper can't walk through boxes or walls. The same is true for the pusher in the game, so the pusher can also be stuck or trapped in an area surrounded by walls and boxes where the boxes can't be pushed out of the way." wrapText="true" />
+            <ImageView fitHeight="192.0" fitWidth="297.0" layoutX="146.0" layoutY="441.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../resources/image/rule01.gif" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="192.0" fitWidth="297.0" layoutX="146.0" layoutY="593.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../resources/image/rule02.gif" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="192.0" fitWidth="297.0" layoutX="146.0" layoutY="746.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../resources/image/rule03.gif" />
+               </image>
+            </ImageView>
+         </children></AnchorPane>
+  </content>
+</ScrollPane>
